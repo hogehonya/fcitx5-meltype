@@ -2,6 +2,31 @@
 
 以下はAndroid実装後の受入条件です。現在はAPKがなく、どの条件もAndroid上で成功確認していません。Linuxでの動作をAndroidの合格証拠に流用しません。
 
+## ビルド成果物の検証 (自動)
+
+[scripts/build-core.py](../scripts/build-core.py) は build の入力と成果物を自動で検証します。次が
+合格条件で、1つでも外れたら成果物を残さず非 0 で終わります。実 build の実行記録は
+[BUILD.md の実行記録](BUILD.md#実行記録)にあります。
+
+- core の SHA が lock の固定値で、作業ツリーが clean
+- `dotnet --version` と NDK の `Pkg.Revision` が lock の固定値
+- core の `InvariantGlobalization=false` が維持されている
+- publish ログと発生した警告が保存されている (警告の存在を成功条件にはしない)
+- `llvm-readelf` で `ELF64` / `AArch64` / `DYN` (little endian) である
+- `meltype_init` / `meltype_create` / `meltype_destroy` / `meltype_handle_key` / `meltype_commit` /
+  `meltype_select_candidate` / `meltype_set_direct` / `meltype_free` / `meltype_set_data_directory`
+  が定義済みシンボルとして export されている (`meltype_init@@V1.0` のような版付きも可)
+- すべての `LOAD` セグメントの `p_align` が 16384 以上
+- 成果物の SHA256 が manifest の記録と一致し、元 core に build 出力が残っていない
+
+未確認 (script の検証でも実機でもまだ確かめていない):
+
+- 実機 Android での ICU/globalization の解決
+- 設定・学習の JSON 保存
+- APK への収録と端末での動作
+
+単体テスト (`tests/`) の内容と実行方法は [tests/README.md](../tests/README.md) を参照してください。
+
 ## build・ロード
 
 - 固定core/host/submodule SHA、.NET SDK/runtime pack、JDK、NDK、SDK、ABIを記録し、新しいcloneから再現する。
