@@ -1,0 +1,51 @@
+{
+  "lock_version": 1,
+  "core": {
+    "repository": "https://gitea.honya.dev/honya-dev-forks/meltype.git",
+    "sha": "9c84625e894f50f06cafba1c6aada5eaa65208f4",
+    "clean_tree_required": true
+  },
+  "toolchain": {
+    "dotnet_sdk": "10.0.100",
+    "ndk": "28.0.13004108",
+    "ndk_llvm_bin": "toolchains/llvm/prebuilt/linux-x86_64/bin"
+  },
+  "target": {
+    "rid": "linux-bionic-arm64",
+    "android_abi": "arm64-v8a",
+    "elf_class": "ELF64",
+    "elf_machine": "AArch64",
+    "elf_type": "DYN",
+    "min_page_align": 16384
+  },
+  "publish": {
+    "project": "src/Meltype.Mac.Native/Meltype.Mac.Native.csproj",
+    "configuration": "Release",
+    "properties": [
+      "PublishAot=true",
+      "NativeLib=Shared",
+      "DisableUnsupportedError=true",
+      "PublishAotUsingRuntimePack=true"
+    ],
+    "nuget_sources": [
+      "https://api.nuget.org/v3/index.json"
+    ],
+    "artifact_name": "MeltypeNative.so",
+    "installed_name": "libMeltypeNative.so"
+  },
+  "required_exports": [
+    "meltype_init",
+    "meltype_create",
+    "meltype_destroy",
+    "meltype_handle_key",
+    "meltype_commit",
+    "meltype_select_candidate",
+    "meltype_set_direct",
+    "meltype_free",
+    "meltype_set_data_directory"
+  ],
+  "license_files": [
+    "LICENSE",
+    "THIRD-PARTY-NOTICES.md"
+  ]
+}

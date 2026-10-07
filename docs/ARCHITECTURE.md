@@ -22,7 +22,7 @@ contextごとにsession handleを持ち、破棄・focus離脱・resetで未確�
 
 必要変更は次のとおりです。
 
-- appの私有filesDir配下を初回session生成前に渡せる保存先APIをcoreへ追加する。SpecialFolder.LocalApplicationDataがAndroidで期待するパスになると仮定しない。plugin APK自身ではなくhost IME processが書ける領域を使う。
+- 保存先は固定coreに既存の`meltype_set_data_directory` (UTF-8の絶対パス、最初のSessionや設定・学習の読み込みより前に1回) をhostから呼ぶ。coreへのAPI追加は不要。SpecialFolder.LocalApplicationDataがAndroidで期待するパスになると仮定しない。plugin APK自身ではなくhost IME processが書ける領域を使う。
 - 既存callbackにはMozc Learnがない。学習をMVPへ含めるならlearn/save callbackを追加し、確定した文節と文脈を伝える。省く場合はMozc学習未対応と明記し、Meltype自身の学習との違いを示す。
 - isWord callback/wordProviderのAndroid実装と辞書供給を決める。NULLならその経路を使わない既存挙動を検証し、英語判定が完成済みとは扱わない。
 - C++ callbackの例外を内部で捕捉しNULL等で失敗を返す。handle不正・二重破棄・初期化失敗でIME全体を落とさない。

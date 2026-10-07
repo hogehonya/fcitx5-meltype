@@ -1,0 +1,3 @@
+# Python (scripts/build-core.py と tests を動かしたときに出るもの)
+__pycache__/
+*.pyc

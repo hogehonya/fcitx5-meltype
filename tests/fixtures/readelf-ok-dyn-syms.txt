@@ -1,0 +1,15 @@
+
+Symbol table '.dynsym' contains 12 entries:
+   Num:    Value          Size Type    Bind   Vis       Ndx Name
+     0: 0000000000000000     0 NOTYPE  LOCAL  DEFAULT   UND
+     1: 0000000000000000     0 FUNC    GLOBAL DEFAULT   UND __cxa_finalize@LIBC
+     2: 0000000000000000     0 FUNC    GLOBAL DEFAULT   UND __cxa_atexit@LIBC
+     3: 0000000000004860     8 FUNC    GLOBAL DEFAULT    12 meltype_init
+     4: 0000000000004868     8 FUNC    GLOBAL DEFAULT    12 meltype_create
+     5: 0000000000004870    16 FUNC    GLOBAL DEFAULT    12 meltype_destroy
+     6: 0000000000004880    20 FUNC    GLOBAL DEFAULT    12 meltype_handle_key
+     7: 00000000000048a8    20 FUNC    GLOBAL DEFAULT    12 meltype_select_candidate
+     8: 00000000000048bc    16 FUNC    GLOBAL DEFAULT    12 meltype_set_direct
+     9: 00000000000048cc    16 FUNC    GLOBAL DEFAULT    12 meltype_free
+    10: 0000000000004894    20 FUNC    GLOBAL DEFAULT    12 meltype_commit
+    11: 00000000000048dc    28 FUNC    GLOBAL DEFAULT    12 meltype_set_data_directory
