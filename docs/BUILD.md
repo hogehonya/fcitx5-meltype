@@ -48,8 +48,10 @@ test -d "$meltype_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin"
 export PATH="$meltype_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
 dotnet --version
 clang --version
-dotnet publish "$meltype_build_root/core/src/Meltype.Mac.Native/Meltype.Mac.Native.csproj"   -c Release -r linux-bionic-arm64   -p:PublishAot=true -p:NativeLib=Shared   -p:DisableUnsupportedError=true -p:PublishAotUsingRuntimePack=true
+dotnet publish "$meltype_build_root/core/src/Meltype.Mac.Native/Meltype.Mac.Native.csproj"   -c Release -r linux-bionic-arm64   -p:PublishAot=true -p:NativeLib=Shared   -p:DisableUnsupportedError=true -p:PublishAotUsingRuntimePack=true --source https://api.nuget.org/v3/index.json
 ```
+
+固定coreの`nuget.config`はpackageSourcesをclearするため、初回clean環境でNativeAOTコンパイラとruntime packをrestoreするには取得先が必要です。既存`linux/build.sh`と同様に、このpublishだけ`--source https://api.nuget.org/v3/index.json`を明示します。
 
 `linux-bionic-arm64`と2つのBionic用flagはv10資料の手順です。`android-arm64`ではpublishしません。これはC ABI共有ライブラリの検証で、Android addonやAPKを完成させるコマンドではありません。成果物候補はcoreの`bin/Release/net10.0/linux-bionic-arm64/publish/`です。実際の`.so`名・exports・NEEDED依存を確認してからAPK向け`libMeltypeNative.so`の収録を実装します。
 
