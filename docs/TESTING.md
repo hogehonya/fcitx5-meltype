@@ -51,3 +51,7 @@
 - 日本語候補、英語保持、文節境界、空文字、非BMP文字についてcursor/UTF-16とFcitx側の位置単位を照合する。
 
 [ビルド](BUILD.md) / [構成](ARCHITECTURE.md) / [文書一覧](README.md)
+
+## Linux addon の実行済み検証
+
+[addon/README.md](../addon/README.md) の実 NativeAOT / Fcitx InputContext integration test と、隔離 D-Bus / Xvfb の GTK 混在文入力が成功しました。Android APK と端末試験の成功を意味しません。

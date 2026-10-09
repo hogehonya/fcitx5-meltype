@@ -4,7 +4,7 @@ Fcitx5の入力・候補UIを使い、Meltypeの判定・ローマ字・混在�
 
 ## 実装の配置
 
-このrepoにC++ addon、Mozc bridge、ABI header、Androidパッケージ統合用定義を作ります。共通coreの必要変更はMeltype forkへ還元し、Fcitx5 Android forkにはこのrepoの固定revisionを参照する`plugin/meltype`とmodule登録を追加します。これらのディレクトリ・登録は現在まだ存在しません。
+このrepoにC++ addon、Mozc bridge、ABI header、Androidパッケージ統合用定義を作ります。共通coreの必要変更はMeltype forkへ還元し、Fcitx5 Android forkにはこのrepoの固定revisionを参照する`plugin/meltype`とmodule登録を追加します。Linux addon と共通 ABI adapter は [addon](../addon/README.md) に実装しました。Android bridge、host module 登録、APK 統合はまだ存在しません。
 
 呼出しは`Fcitx input context → C++ addon → NativeAOT MeltypeNative → C++ Mozc callback`です。別processのLinux helperを起動せず、APKに収録した共有ライブラリを使います。Android 10以降の対象アプリは書込み可能なapp home内のファイルをexecveできません。[Android公式制限](https://developer.android.com/about/versions/10/behavior-changes-10#execute-permission)
 
