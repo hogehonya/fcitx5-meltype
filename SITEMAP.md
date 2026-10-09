@@ -14,3 +14,7 @@
 - [docs/BUILD.md](docs/BUILD.md): ビルド工程と実行記録
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): 構成とABI
 - [docs/TESTING.md](docs/TESTING.md): 受入検証
+
+- [addon/README.md](addon/README.md): Linux Fcitx5 addon と共通 ABI adapter の build・試験
+- [LICENSE](LICENSE): GPL 原本
+- [NOTICE](NOTICE): 上流由来と別配布依存の帰属

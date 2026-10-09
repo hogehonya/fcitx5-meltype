@@ -1,9 +1,10 @@
-# Meltype Android
+# Meltype Fcitx5 plugin (Linux / Android)
 
-MeltypeをFcitx5 for Androidのプラグインとして開発するリポジトリです。Android実装、Gradleプロジェクト、APKはまだありません。固定coreからarm64 (arm64-v8a) のNativeAOT共有ライブラリを作るビルド入口と単体テストがあり、controller環境で実buildとELF検証を確認しています。端末検証は未実施です。
+Meltypeを Linux と Fcitx5 for Android のプラグインとして開発するリポジトリです。公開先は [hogehonya/fcitx5-meltype](https://github.com/hogehonya/fcitx5-meltype) です。Linux Fcitx5 addon と共通 ABI adapter があり、実 core と GUI で混在入力を検証しました。Android factory/bridge の統合、Gradleプロジェクト、APKはまだありません。固定coreからarm64 (arm64-v8a) のNativeAOT共有ライブラリを作るビルド入口と単体テストがあり、controller環境で実buildとELF検証を確認しています。端末検証は未実施です。
 
-ユーザー確定事項は「Fcitx5プラグイン形式」と「リポジトリ・ビルド文書の作成」です。[Issue #1](https://gitea.honya.dev/honya-dev-forks/meltype-android/issues/1)を要求の入口とし、固定coreからのNativeAOT成果物生成を[Issue #3](https://gitea.honya.dev/honya-dev-forks/meltype-android/issues/3)で扱います。NativeAOTとarm64を最初のMVPに使う構成は調査に基づくAgent提案です。
+ユーザー確定事項は「Fcitx5プラグイン形式」「リポジトリ・ビルド文書の作成」と、Issue #6 のプラグイン実装です。[Issue #1](https://gitea.honya.dev/honya-dev-forks/meltype-android/issues/1)を要求の入口とし、固定coreからのNativeAOT成果物生成を[Issue #3](https://gitea.honya.dev/honya-dev-forks/meltype-android/issues/3)で扱います。NativeAOTとarm64を最初のMVPに使う構成は調査に基づくAgent提案です。
 
+- [Linux Fcitx5 addon の build・試験・導入](addon/README.md)
 - [ビルド入口と工程 (実行記録つき)](docs/BUILD.md)
 - [構成・ABI・必要な実装](docs/ARCHITECTURE.md)
 - [実装後の受入検証](docs/TESTING.md)

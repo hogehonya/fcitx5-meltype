@@ -1,8 +1,8 @@
 # ビルド準備と工程
 
 このrepoのビルド入口は `scripts/build-core.py` です。固定coreから `arm64-v8a` の NativeAOT 共有
-ライブラリを作り、`manifest.json` と検証結果を残します。Gradle task、Fcitx5 addon、APK はまだ
-ありません。addon/APK の工程は後半に書きます。
+ライブラリを作り、`manifest.json` と検証結果を残します。Linux Fcitx5 addon は [addon/README.md](../addon/README.md) の独立 CMake 入口で build できます。
+Android Gradle task、factory/bridge 統合、APK はまだありません。Android addon/APK の工程は後半に書きます。
 
 controller環境で共有ライブラリの生成、必須export、16KB LOAD alignmentを検証しています。
 worker sandboxのAF_UNIX制限による失敗は[実行記録](#実行記録)で分離しています。
