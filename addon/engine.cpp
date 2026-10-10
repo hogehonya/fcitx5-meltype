@@ -148,6 +148,19 @@ void Engine::keyEvent(const fcitx::InputMethodEntry &,fcitx::KeyEvent &event) {
     State *state=nullptr;
     try {
         state=ic->propertyFor(&factory_);
+        const auto sym=event.key().sym();
+        const bool modeKey=sym==FcitxKey_Muhenkan || sym==FcitxKey_Henkan ||
+            sym==FcitxKey_Hiragana || sym==FcitxKey_Hiragana_Katakana;
+        if(modeKey) {
+            // Modified mode keys belong to application/global shortcuts.
+            if(event.key().states()) return;
+            if(state->session && state->preedit) apply(ic,state->session->commit());
+            state->direct=sym==FcitxKey_Muhenkan;
+            ic->updateUserInterface(fcitx::UserInterfaceComponent::StatusArea);
+            event.filterAndAccept();
+            return;
+        }
+        if(state->direct) return;
         auto key=mapKey(event.key());
         if(!key.vk) {
             // Preserve text order when a non-BMP/unhandled key passes to the app.
@@ -163,6 +176,12 @@ void Engine::keyEvent(const fcitx::InputMethodEntry &,fcitx::KeyEvent &event) {
         FCITX_ERROR() << "Meltype key processing failed";
         recover(ic,state);
     }
+}
+std::string Engine::subMode(const fcitx::InputMethodEntry &,fcitx::InputContext &ic) {
+    return ic.propertyFor(&factory_)->direct?"英字直接入力":"Meltype 自動判定";
+}
+std::string Engine::subModeLabelImpl(const fcitx::InputMethodEntry &,fcitx::InputContext &ic) {
+    return ic.propertyFor(&factory_)->direct?"A":"あ";
 }
 void Engine::reset(const fcitx::InputMethodEntry &,fcitx::InputContextEvent &event) {
     auto *ic=event.inputContext(); State *state=nullptr;

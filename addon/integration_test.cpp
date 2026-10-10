@@ -72,6 +72,35 @@ int main() {
     pending=b.inputPanel().clientPreedit().toString();
     require(!send(b,static_cast<fcitx::KeySym>(0x0101f600)),"emoji key pass-through");
     require(b.committed==prefix+pending && b.inputPanel().clientPreedit().empty(),"pending commit precedes non-BMP key");
+    Context direct(manager),normal(manager);
+    const fcitx::InputMethodEntry entry{"meltype","Meltype","ja","meltype"};
+    type(direct,"nihongo");
+    auto expected=direct.inputPanel().clientPreedit().toString();
+    require(send(direct,FcitxKey_Muhenkan),"Muhenkan consumed");
+    require(direct.committed==expected && direct.inputPanel().clientPreedit().empty(),"mode change commits pending once");
+    require(engine.subModeLabel(entry,direct)=="A","direct mode visible");
+    for(auto key: {FcitxKey_a,FcitxKey_A,FcitxKey_space,FcitxKey_exclam,FcitxKey_BackSpace})
+        require(!send(direct,key),"direct keys pass to application");
+    require(!send(direct,FcitxKey_Henkan,true),"mode key release ignored");
+    fcitx::KeyEvent shortcut(&direct,fcitx::Key(FcitxKey_Henkan,fcitx::KeyState::Ctrl));
+    engine.keyEvent(entry,shortcut);
+    require(!shortcut.accepted() && engine.subModeLabel(entry,direct)=="A","modified mode key preserved");
+    type(normal,"nihongo");
+    require(normal.inputPanel().clientPreedit().toString()=="日本語","mode is context local");
+    fcitx::InputContextEvent leave(&direct,fcitx::EventType::InputContextReset);
+    engine.deactivate(entry,leave);
+    require(engine.subModeLabel(entry,direct)=="A" && direct.committed==expected,"deactivation retains mode without double commit");
+    require(send(direct,FcitxKey_Henkan),"Henkan returns to automatic mode");
+    type(direct,"nihongo");
+    require(direct.inputPanel().clientPreedit().toString()=="日本語","normal Meltype resumes");
+    send(direct,FcitxKey_space);
+    auto candidate=direct.inputPanel().clientPreedit().toString();
+    send(direct,FcitxKey_Muhenkan); send(direct,FcitxKey_Muhenkan);
+    require(direct.committed==expected+candidate,"candidate mode change commits exactly once");
+    require(send(direct,FcitxKey_Hiragana) && engine.subModeLabel(entry,direct)=="あ","Hiragana resumes automatic mode");
+    fcitx::KeyEvent locks(&direct,fcitx::Key(FcitxKey_Muhenkan,fcitx::KeyStates(fcitx::KeyState::CapsLock)|fcitx::KeyState::NumLock));
+    engine.keyEvent(entry,locks);
+    require(locks.accepted() && engine.subModeLabel(entry,direct)=="A","lock states do not suppress mode key");
     std::cout<<"real NativeAOT/Fcitx context integration PASS\n";
  } catch(const std::exception &e) { std::cerr<<e.what()<<"\n";return 1; }
 }
