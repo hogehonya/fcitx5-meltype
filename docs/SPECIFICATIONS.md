@@ -1,6 +1,6 @@
 # 要件定義
 
-[要求定義](REQUIREMENTS.md)を、実装で判定できる条件へ分解する。以下は検証済みAndroidブランチの仕様であり、mainへ全コードが反映済みという意味ではない。実測と未確認範囲の正本は[TESTING](TESTING.md)、固定ビルド入力の正本は[BUILD](BUILD.md)。
+[要求定義](REQUIREMENTS.md)を、実装で判定できる条件へ分解する。S-01/S-08とNFは共通の責務・文書・制約、S-02〜07はAndroid、S-09はLinux addonの仕様です。Androidは検証済み実装ブランチを対象とし、mainへ全コードが反映済みという意味ではありません。実測と未確認範囲の正本は[TESTING](TESTING.md)、固定ビルド入力の正本は[BUILD](BUILD.md)。
 
 ## 機能要件と受入
 
@@ -13,7 +13,8 @@
 |S-05|R-02|Meltype変換学習をconversions.jsonへ保存し、別processでSpace変換した際の先頭候補・commitへ再適用する|VR-05: 非既定hashi候補保存→通常phase終了→reload phase。3端末PASS。2文字読みはlive変換下限未満なのでSpaceで判定。Mozc固有学習callbackは未対応|
 |S-06|R-03|既存QWERTY/数字行/記号面/左右矢印を保ち、新規設定の既定値としてPixel light/darkのキー背景・隙間・角丸とIBM Plex Sans JPを使う。保存済みの明示設定は維持する|VR-06: hostコード確認、moto dark/F-52E lightの日本語入力。全記号・矢印・回転・全IME切替は未確認|
 |S-07|R-01/R-02|固定core/NDK/ABIでNativeAOTを生成し、host/plugin/test APKを生成する。共有ライブラリ依存を解決し端末でaddonをロードできる|VR-07: build、APK checker、Python30件、bridge engine、core186件成功。16KB ELF alignment確認、16KB端末未確認|
-|S-08|R-04/R-05|READMEから要求・要件・設計・ビルド・検証へ辿れる。APKはローカル保管のみ、GitHub Release未公開、CI未mergeを明示する|VR-08: 文書diff・リンク・独立reviewで確認。実装3PRのCI待ちを保持|
+|S-08|R-04/R-05|READMEから要求・要件・設計・ビルド・検証へ辿れる。公開先・APK配布・merge/CIの現状を証拠と確認日付きで案内し、未公開・未確認を成功扱いしない|VR-08: 文書diff・リンク・独立reviewで確認。可変の進捗は[公開状況](../README.md#androidのビルドとapk入手)を参照|
+|S-09|R-01|LinuxでFcitx addonから既存NativeAOT providerと外部Mozc helperへ接続し、混在入力・候補選択・commitを提供する。Android保存先APIをLinux配布ABIへ無条件要求しない|VR-09: Linux実provider/InputContext integrationと異常回復の既存2tests、隔離GTKでkyouhagithubnipushshita→今日はgithubにpushしたを完全一致確認。[Linux記録と回帰条件](TESTING.md#linux-addon-の実行済み検証)|
 
 ## 非機能要件
 
