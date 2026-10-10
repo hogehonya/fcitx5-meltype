@@ -73,15 +73,17 @@ Android 12でaddonロード、ICU初期化、日本語変換、変換学習JSON�
 
 |用途|APK version|SHA256|
 |---|---|---|
-|host|`0.1.3-22-g137c919b` arm64 debug|`622b7f7f74d5a353ef53aaa4a10d05d2c9b640c3086a79299e5e7077f4a55bb9`|
+|host|`0.1.3-25-gab2f5117` arm64 debug|`09dae1550ebfad2c7fc12206df7777d7c1d72dccc0eb739e8a7ea79d262cf9ab`|
 |instrumentation|`0.1.3-25-gab2f5117` debug AndroidTest|`b22e0aebdc8936f23a380e2bdfa7253d5a1e3a6c5f4f7050f3662976f19d6eae`|
 |plugin|`0.1.3-28-g65922d39` arm64 debug|`be496fe31cfc059209e05abe8950359204a9c7ad4d3cd46a00ba8379a8314995`|
+
+配布APKは `/home/honya/Downloads/Meltype-Android-20261010` に保管し、実機の最終導入はhost 25 / plugin 28です。
 
 plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`。APK内NativeAOT provider SHA256は `200b5150bc97afa7c01f5d28825fa430bda18d19539de9c66990a13101725339` でbuild manifestと一致。テストAPKはbuild metadataのcommit後に追加したreload仕様修正（host `9821b319`）を含みます。host product codeは同じで、その後のgitlink・文書更新による再buildは不要です。
 
 - `Loaded addon meltype`を実機logcatで確認。初回のSONAME欠落は正式publishのLinkerArgで修正済み。
 - `MeltypeTest`通常実行 PASS（2.829秒）: `nihongo`→候補選択→`日本語`、`kyouhagithubnipushshita`→`今日はgithubにpushした`の完全一致、非既定漢字候補のJSON保存。
-- 別processの `-e phase reload` PASS（2.215秒）: 保存した読みをSpaceで変換した際の先頭候補と、候補を選び直さずReturnで確定した文字列が保存した学習結果と一致。
+- 別processの `-e phase reload` PASS（2.215秒）、最終host APK更新後の再確認もPASS（2.305秒）: 保存した読みをSpaceで変換した際の先頭候補と、候補を選び直さずReturnで確定した文字列が保存した学習結果と一致。
 - 保存先はnative正本 `DataManager.dataDir/files/meltype`（この端末ではdevice-protected storage）。ConversionHistoryのNativeAOT reflection読込失敗はsource-generated metadataで修正。既存JSON形式、不正JSON、保存後の別instance読込、Forgetをcoreテストで確認し全186/186 PASS。
 - GUIでMeltypeを選択し、ソフトキー7tapで `nihongo`→`日本語` preedit、Spaceで `日本語/ニホンゴ/にほんご/Japanese`候補表示、先頭候補tap＋Enterで`日本語`確定。dark Pixelのキー境界、数字行、左右矢印、IBM Plex Sans JP表示を確認。
 - GUI証拠は実施環境の `/tmp/meltype-touch-nihongo.png`、`/tmp/meltype-candidates-ready.png`、`/tmp/meltype-touch-commit.png`。リポジトリへの画像収録はしていません。
