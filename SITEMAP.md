@@ -12,7 +12,7 @@
 - [tests/fixtures/README.md](tests/fixtures/README.md): llvm-readelf 出力の fixture
 - [docs/README.md](docs/README.md): 文書入口
 - [docs/BUILD.md](docs/BUILD.md): ビルド工程と実行記録
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): 構成とABI
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): 実装・計画の境界、ABI、キーボード要求
 - [docs/TESTING.md](docs/TESTING.md): 受入検証
 
 - [addon/README.md](addon/README.md): Linux Fcitx5 addon と共通 ABI adapter の build・試験

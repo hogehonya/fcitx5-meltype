@@ -6,7 +6,7 @@ Copyright (C) 2026 Yukishiro (@yksr_melt / @yksr-melt).
 Upstream: https://github.com/yksr-melt/Meltype
 Source references: linux/ibus-engine-meltype, src/Meltype.Mac.Native/Exports.cs,
 src/Meltype.Core/Composition/MeltypeSession.cs.
-The addon and tests were added in 2026 for this fork.
+The addon and tests were added in 2026 for this plugin repository.
 
 No Fcitx, Mozc or NativeAOT binary/source dependency is bundled by this addon.
 Fcitx is linked through its public API; the provider library and Mozc helper
