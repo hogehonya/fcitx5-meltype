@@ -1,14 +1,14 @@
 # 基本設計
 
-Fcitx5の入力・候補UI、Meltypeの混在入力判定・ローマ字・学習、Mozcの日本語変換を組み合わせる。[要求定義](REQUIREMENTS.md)のR-01〜05と[要件定義](SPECIFICATIONS.md)のS-01〜08・NF-01〜04に対応する。依存revisionと再現手順は[BUILD](BUILD.md)、合否と実行記録は[TESTING](TESTING.md)を正本とする。
+Fcitx5の入力・候補UI、Meltypeの混在入力判定・ローマ字・学習、Mozcの日本語変換を組み合わせる。[要求定義](REQUIREMENTS.md)のR-01〜05と[要件定義](SPECIFICATIONS.md)のS-01〜09・NF-01〜04に対応する。依存revisionと再現手順は[BUILD](BUILD.md)、合否と実行記録は[TESTING](TESTING.md)を正本とする。
 
 ## 実装と公開の状態
 
 2026-10-10時点の実装根拠はplugin `14cbeaa`、host `a0cf7ed8`、core `87b1ae1` の各実装ブランチである。この設計文書のmain反映とAndroid実装のmain反映・公開は別工程であり、Android実装はまだmainへ統合されていない。以下は実装ブランチの動作を記述する。
 
-moto g31とF-52EでGUI入力の成功を確認した。PixelのGUI入力は未確認。core CIはheadの17件が未開始である。Windows/macOSには適合runnerがなく、Linuxの待機原因は未特定で、成功を確認できていない。ビルド、instrumentation、GUI、CI、公開の合否を相互に代用しない。端末・試験別の証拠と未確認範囲は[TESTING](TESTING.md)に集約する。
+moto g31とF-52EでGUI入力の成功を確認した。PixelのGUI入力は未確認。2026-10-10 15:55 JST確認時点でcore head CI17件中Ubuntu push core1件は成功（15:55:14）、残16件はWaiting/Blocked・aggregate pending。Windows/macOSには適合runnerがなく、CI全体の成功は未確認。ビルド、instrumentation、GUI、CI、公開の合否を相互に代用しない。端末・試験別の証拠と未確認範囲は[TESTING](TESTING.md)に集約する。
 
-## 3リポジトリの責務（S-01・S-08）
+## ソース所属と3リポジトリの責務（S-01・S-08・S-09）
 
 |正本|所有する実装|他repoとの境界|
 |---|---|---|
@@ -19,20 +19,20 @@ moto g31とF-52EでGUI入力の成功を確認した。PixelのGUI入力は未�
 ```mermaid
 %%{init: {"themeVariables": {"fontFamily": "IBM Plex Sans JP"}}}%%
 flowchart LR
-    subgraph Host[fcitx5-android / host IME process]
+    subgraph Host[fcitx5-android / hostソース]
         UI[キーボード・候補UI]
         F[Fcitx InputContext]
         UI <--> F
     end
-    subgraph Plugin[fcitx5-meltype / plugin APK]
+    subgraph Plugin[fcitx5-meltype / addon・bridgeソース]
         A[C++ addon / ABI adapter]
         B[in-process Mozc bridge]
         M[Mozc Engine / OSS辞書]
         A --> B
         B --> M
     end
-    subgraph Core[Meltype / 共通core]
-        C[C# NativeAOT / libMeltypeNative.so]
+    subgraph Core[meltype / 共通coreソース]
+        C[C# core / NativeAOT exports]
     end
     F <--> A
     A <--> C
@@ -41,7 +41,35 @@ flowchart LR
     F -->|保存先を供給| D
 ```
 
-図の枠はsource/APKの所有を示す。pluginのaddon、Mozc bridge、NativeAOTはhost IME processにロードされ、別serviceや外部helper processを起動しない。Linux providerは既存の外部Mozc helper経路を使う。
+この図の枠はソースの所属を示し、APK収録先を示さない。pluginのaddon、Mozc bridge、NativeAOTはhost IME processにロードされ、別serviceや外部helper processを起動しない。Linux providerは既存の外部Mozc helper経路を使う。
+
+## Android APK収録と実行先（S-07）
+
+```mermaid
+%%{init: {"themeVariables": {"fontFamily": "IBM Plex Sans JP"}}}%%
+flowchart LR
+    subgraph HostAPK[host APK]
+        UIH[IMEサービス・キーボードUI]
+        FH[Fcitx共有ライブラリ・STL]
+    end
+    subgraph PluginAPK[plugin APK]
+        ADD[libmeltype.so / addon・Mozc bridge・静的engineと辞書]
+        NAT[libMeltypeNative.so / NativeAOT provider]
+        AS[addon・inputmethod設定・ライセンス]
+    end
+    subgraph Process[host IME process]
+        LOAD[Fcitx addon loader]
+        RUN[addon・provider・Mozc実行]
+    end
+    UIH --> LOAD
+    FH --> LOAD
+    ADD --> LOAD
+    NAT --> RUN
+    AS --> LOAD
+    LOAD --> RUN
+```
+
+`libMeltypeNative.so`のソースはmeltype repoに所属するが、生成したproviderはplugin APKへ収録する。Mozc OSS辞書は生成headerから静的engineへ組み込まれ、独立した辞書assetとして配置する設計ではない。addon/bridge/辞書と同じplugin APKに配置し、host APKへproviderを重複収録しない。pluginはhostのFcitx共有ライブラリ/STLを利用し、実行時は両APKのライブラリがhost IME processで動く。LinuxではAPKを使わず、addonと指定provider/helperを[Linux手順](../addon/README.md)で配置する。
 
 ## 起動・保存先（S-02・S-05）
 

@@ -14,7 +14,7 @@
 
 通常phaseはnihongo→日本語、kyouhagithubnipushshita→今日はgithubにpushしたの完全一致と非既定hashi候補のJSON保存を確認します。reloadは別processでSpace変換後の先頭候補とcommitへ学習が戻ることを確認します。ICU初期化・addonロード成功、.broken無しを確認。変換履歴のAOT読込はsource-generated serializerで修正済みです。
 
-APK build/checker、Python30件、bridge engine、core186件が成功。16KB ELF LOAD alignmentは確認済みですが、16KB page端末、API24下限、変換履歴以外のJSON用途、全focus/回転/記号/矢印は実機未確認。Mozc固有学習callbackは未対応。host lintは既存269件で失敗、変更ファイル0件と分離記録しています。coreのhead CI17件は未開始。Windows/macOS適合runnerはなく、Linux待機原因は未特定、実装3PRは依存順にmerge保留。
+APK build/checker、Python30件、bridge engine、core186件が成功。16KB ELF LOAD alignmentは確認済みですが、16KB page端末、API24下限、変換履歴以外のJSON用途、全focus/回転/記号/矢印は実機未確認。Mozc固有学習callbackは未対応。host lintは既存269件で失敗、変更ファイル0件と分離記録しています。2026-10-10 15:55 JST確認時点でcore head CI17件中Ubuntu push core1件は成功（15:55:14）、残16件はWaiting/Blocked・aggregate pending。Windows/macOS適合runnerはなく、実装3PRは依存順にmerge保留。
 
 APKは `/home/honya/Downloads/Meltype-Android-20261010/` に保管し、GitHub Release未公開。既存IMEを保持してhost25/plugin28を追加導入しました。
 
@@ -74,6 +74,10 @@ mainの旧NativeAOT単体成果物では未確認だった項目（Android完成
 
 [addon/README.md](../addon/README.md) の実 NativeAOT / Fcitx InputContext integration test と、隔離 D-Bus / Xvfb の GTK 混在文入力が成功しました。Android APK と端末試験の成功を意味しません。
 
+S-09/VR-09のLinux受入は、実provider/Fcitx InputContext integrationと異常回復の既存2tests（2/2成功）に加え、隔離D-Bus/XvfbのGTK入力欄で`kyouhagithubnipushshita` + Enter → `今日はgithubにpushした`の完全一致です。Linux配布v1.0.0 provider/helperを使用し、Android NativeAOT成果物の試験結果で代替しません。再実行のbuild/ctest手順は[addon手順](../addon/README.md#実-core--fcitx-inputcontext-test)を参照します。
+
+共通`engine.cpp`、`session.h`、`meltype_abi.h`、providerのABI/JSON/キー処理を変更した場合は、Android試験だけで完了せず、このLinux2testsと隔離GTK混在入力を再実行します。使用provider・helper・Fcitx版、変更revision、コマンド、期待/実結果を本書または関連Issueへ記録し、実行不能なら理由とLinux受入未完を明記します。文書のみの今回変更は実装差分がなく、過去成功を今回再実行成功とは扱いません。
+
 ## hostキーボードの設計受入
 
 [R-03要求](REQUIREMENTS.md)と[基本設計](ARCHITECTURE.md)の受入項目です。moto dark/F-52E lightの日本語操作は上記で確認済み。次の全操作の網羅検証とPixel GUIは未完です。
@@ -84,3 +88,21 @@ mainの旧NativeAOT単体成果物では未確認だった項目（Android完成
 - IME切替と配列/記号面切替のラベル・操作・結果を区別し既存入力を維持する。
 - light/dark双方でキー境界・文字・候補・選択状態が読める。日本語デザイン成果物の実装はIBM Plex Sans JPを使用する。
 - 実機画面と操作で採否を記録する。12キー/フリックは別途採用決定が必要。
+
+## 2026-10-10 文献基準による状態点検
+
+対象は文書main `e73ed756`とIssue #15の文書修正、実装core `87b1ae13` / plugin `41a79d4` / host `e264cffa`です。今回の変更は文書のみで実装コードは変えていません。
+
+文献の整理正本は[Gitea調査文書](https://gitea.honya.dev/honya-records/investigations/src/branch/main/2026-10-10-requirements-engineering-literature.md)です。[NASA System Design Processes 4.0](https://www.nasa.gov/reference/4-0-system-design-processes/)の4.1目的・利用場面、4.2検証可能性と追跡、4.3機能分解、4.4設計判断、および[Appendix C](https://www.nasa.gov/reference/appendix-c-how-to-write-a-good-requirement/) C.4を点検の観点に使います。[IPA要件定義ガイド](https://www.ipa.go.jp/archive/digital/iot-en-ci/jyouryuu/youkenteigi20190912.html)は公式概要・章構成まで確認しています。[IPA公式目次](https://www.ipa.go.jp/archive/publish/tn20191220.html)の第7章7.12非機能要求・7.13運用/移行/総合テストを確認しましたが、498ページの全文は未読です。NASA Appendix C C.4は曖昧さ、一要件一内容、双方向追跡、性能、異常復旧、検証可能性の本文を確認しました。書籍・ISO本文は精読しておらず、正式な規格適合審査ではありません。
+
+|観点|確認した事実|未確認・不足|
+|---|---|---|
+|目的・要求出所|R-01〜05とIssueにユーザー要求・日時・出所を記録|日常利用の成功条件は部分的|
+|追跡|R→S/NF→VR→試験参照あり。今回Linux S-09/VR-09を追加|全受入項目を実測済みという意味ではない|
+|検証可能性|代表文字列の完全一致と学習復元は判定可能|遅延・メモリ等の目標は未決。Agentが数値を追加しない|
+|構成・設計|3repo、入力・状態・ビルド工程、ソース所属とAPK収録の図を記述|主要方式の比較・不採用理由は不足|
+|異常時・運用|ABI異常回復の記述と受入計画あり|容量不足・辞書欠損・password/focus/回転の実機証拠は不足|
+|受入|Android3台instrumentation、Linux2testsと隔離GTKの成功記録あり|Pixel GUI、下限API、16KB page端末等は未確認|
+|変更・公開|Issue/PR/SHAとソース・APK公開状態を区別|実装PRはCI未完・未merge、APKはGitHub Release未公開|
+
+実機試用に進める実装と設計の骨格はありますが、要求全体の完了判定、異常系・非機能の証拠、実装の統合公開は未完です。上表の不足は提案・未決事項として記録し、この状態点検を根拠に追加機能や数値目標を確定しません。最新のCI・公開状態は[公開状況](../README.md#androidのビルドとapk入手)と実装PRを参照します。
