@@ -9,7 +9,7 @@ worker sandboxのAF_UNIX制限による失敗は[実行記録](#実行記録)で
 
 ## 固定する依存
 
-固定値の正本は [`scripts/deps.lock.json`](../scripts/deps.lock.json) です。script はこの値と実物が
+core/toolchain/ABI固定値の正本は [`scripts/deps.lock.json`](../scripts/deps.lock.json) です。host SHAはJSONに含めず下表を正本とします。script はlockの値と実物が
 一致しなければ build を始めません。値を変えるときは lock を更新し、理由と検証を Issue へ記録します。
 
 |依存|固定revision|用途|
@@ -148,3 +148,9 @@ APK packaging 側の alignment は別途確認します。[16KB公式手順](htt
 現在のビルド入口、必要な固定入力、host登録、SDK/ABI、成果物検査は[Android手順](../android/README.md)を正本とします。root CMake は in-process Mozc bridge、`android/plugin` は Android addon/APK、`addon/CMakeLists.txt` は Linux addonです。
 
 [構成](ARCHITECTURE.md) / [検証](TESTING.md) / [文書一覧](README.md)
+
+## 依存更新と公開
+
+core更新はMeltype forkで上流差分と必要変更を検証しlockを検証済みrevisionへ更新します。ABIシグネチャ・実export・JSON schema・所有権の互換性とライセンスを照合し回帰試験と実buildを行います。host更新は本書のSHAとsubmodule/build条件・キーボード基準を再確認します。統合後は端末回帰試験も行い未実施はIssueへ記録します。Linux provider版は[addon](../addon/README.md)で別管理します。
+
+Gitea `origin/main`を正本とし、PR・検証・マージ後の同じrevisionを公開GitHub `hogehonya/fcitx5-meltype` の `main`へfast-forwardのみで反映し、公開先の履歴を保持します。現在このrepoにCIは設定されていないため、該当する既存テスト・リンク・diff検査を実行します。今後CIを設定した場合は成功を必須とします。releaseは両main一致確認後に作成しcore/hostと検証範囲を記録します。現在、自動mirrorは設定されていません。

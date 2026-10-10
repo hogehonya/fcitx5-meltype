@@ -7,11 +7,13 @@ Meltypeを Linux と Fcitx5 for Android のプラグインとして開発する�
 - [Linux Fcitx5 addon の build・試験・導入](addon/README.md)
 - [ビルド入口と工程 (実行記録つき)](docs/BUILD.md)
 - [構成・ABI・必要な実装](docs/ARCHITECTURE.md)
-- [実装後の受入検証](docs/TESTING.md)
+- [実行済み検証とAndroidの受入条件](docs/TESTING.md)
 - [ビルドscriptの使い方](scripts/README.md) / [単体テスト](tests/README.md)
 - [文書一覧](docs/README.md) / [サイトマップ](SITEMAP.md)
 
 Android addonとbridgeの実装正本はこのリポジトリとします。共通C# coreは[Meltype fork](https://gitea.honya.dev/honya-dev-forks/meltype)、IMEサービスとキーボードUIは[Fcitx5 Android fork](https://gitea.honya.dev/honya-dev-forks/fcitx5-android)の担当です。host側の`plugin/meltype`登録・APK統合はhost Issue #10とこのrepo Issue #8で扱います。Linux IBusランチャーはAndroidの起動方法として使いません。
+
+独立pluginの由来・公開方針とGboard/ATOK参考のキーボード要求は[構成の正本](docs/ARCHITECTURE.md)を参照してください。
 
 上流MeltypeのGPL-3.0-or-laterと、Mozc/Fcitx等の第三者ライセンス・copyright・NOTICEを保持します。依存コードの導入時に原本を同梱し、独自の互換性判断やライセンス変更を行いません。
 

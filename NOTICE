@@ -7,7 +7,7 @@ Upstream: https://github.com/yksr-melt/Meltype
 Source references: linux/ibus-engine-meltype, src/Meltype.Mac.Native/Exports.cs,
 src/Meltype.Core/Composition/MeltypeSession.cs,
 native/mozc/meltype_mozc_helper.cc (in-process bridge adaptation).
-The addon and tests were added in 2026 for this fork.
+The addon and tests were added in 2026 for this plugin repository.
 
 The source repository does not vendor Fcitx, Mozc or NativeAOT binaries.
 Android APK packaging includes the explicitly supplied NativeAOT provider and
