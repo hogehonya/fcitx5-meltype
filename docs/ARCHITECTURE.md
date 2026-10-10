@@ -6,7 +6,7 @@ Fcitx5の入力・候補UIを使い、Meltypeの判定・ローマ字・混在�
 
 既存C++ addon・ABI adapterにAndroid Mozc bridge・factory・パッケージ統合用定義を追加する計画です。共通coreの必要変更はMeltype forkへ還元し、Fcitx5 Android forkにはこのrepoの固定revisionを参照する`plugin/meltype`とmodule登録を追加します。Linux addon と共通 ABI adapter は [addon](../addon/README.md) に実装しました。Android bridge、host module 登録、APK 統合はまだ存在しません。
 
-実装済みLinuxは `Fcitx context → factory.cpp の meltype_init_mozc → NativeAOT → 外部Mozc helper process` です。計画中Androidは `Fcitx context → Android factory の meltype_init(callback) → NativeAOT → in-process C++ Mozc bridge` です。AndroidではAPKに収録した共有ライブラリを使います。Android 10以降の対象アプリは書込み可能なapp home内のファイルをexecveできません。[Android公式制限](https://developer.android.com/about/versions/10/behavior-changes-10#execute-permission)
+Linuxはaddon load時にfactory.cppが `meltype_init_mozc` を呼びます。キー処理は `Fcitx context → engine/session → NativeAOT → 外部Mozc helper process` です。Androidは起動時にfactoryが `meltype_set_data_directory` と `meltype_init(callback)` を呼ぶ計画で、キー処理は `Fcitx context → 共通adapter → NativeAOT → in-process C++ Mozc bridge` です。AndroidではAPKに収録した共有ライブラリを使います。Android 10以降の対象アプリは書込み可能なapp home内のファイルをexecveできません。[Android公式制限](https://developer.android.com/about/versions/10/behavior-changes-10#execute-permission)
 
 ## 再利用するコード
 
@@ -32,6 +32,8 @@ adapterはcontextの最初の対応keyでsessionを遅延作成します。reset
 [ビルド](BUILD.md) / [検証](TESTING.md) / [文書一覧](README.md)
 
 ## ABI profileと初期化
+
+検証済みLinux配布providerと、Android向け固定coreの初期化経路を比較します。
 
 |profile|入力|初期化と状態|
 |---|---|---|

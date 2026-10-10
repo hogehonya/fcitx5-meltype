@@ -161,4 +161,4 @@ APK packaging 側の alignment は別途確認します。[16KB公式手順](htt
 
 core更新はMeltype forkで上流差分と必要変更を検証しlockを検証済みrevisionへ更新します。ABIシグネチャ・実export・JSON schema・所有権の互換性とライセンスを照合し回帰試験と実buildを行います。host更新は本書のSHAとsubmodule/build条件・キーボード基準を再確認します。統合後は端末回帰試験も行い未実施はIssueへ記録します。Linux provider版は[addon](../addon/README.md)で別管理します。
 
-Gitea `origin/main`を正本としPR・CI・マージ後の同じrevisionを公開GitHub `hogehonya/fcitx5-meltype` の `main`へ反映します。releaseは両main一致確認後に作成しcore/hostと検証範囲を記録します。現在、自動mirrorは設定されていません。
+Gitea `origin/main`を正本とし、PR・検証・マージ後の同じrevisionを公開GitHub `hogehonya/fcitx5-meltype` の `main`へfast-forwardのみで反映し、公開先の履歴を保持します。現在このrepoにCIは設定されていないため、該当する既存テスト・リンク・diff検査を実行します。今後CIを設定した場合は成功を必須とします。releaseは両main一致確認後に作成しcore/hostと検証範囲を記録します。現在、自動mirrorは設定されていません。
