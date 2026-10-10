@@ -14,7 +14,7 @@ core/toolchain/ABI固定値の正本は [`scripts/deps.lock.json`](../scripts/de
 
 |依存|固定revision|用途|
 |---|---|---|
-|[Meltype fork](https://gitea.honya.dev/honya-dev-forks/meltype/src/commit/acffd73db5b3fcffe951fdd6e2013c98b376e7fb)|`acffd73db5b3fcffe951fdd6e2013c98b376e7fb`|net10.0 core、C ABI。NativeAOT build の入力|
+|[Meltype fork](https://gitea.honya.dev/honya-dev-forks/meltype/src/commit/353995a43d9f43f78e13d8b9530d262d89962068)|`353995a43d9f43f78e13d8b9530d262d89962068`|net10.0 core、C ABI。NativeAOT build の入力|
 |.NET SDK|`10.0.100`|NativeAOT の publish|
 |Android NDK|`28.0.13004108`|Bionic arm64 のリンクと `llvm-readelf` による検証|
 |RID / ABI|`linux-bionic-arm64` / `arm64-v8a`|build と成果物の対象|
@@ -44,7 +44,7 @@ clean な作業ツリーを渡します。毎回新しい場所へ clone し、�
 set -euo pipefail
 core_root=$(mktemp -d "${TMPDIR:-/tmp}/meltype-core.XXXXXXXX")
 git clone https://gitea.honya.dev/honya-dev-forks/meltype.git "$core_root/core"
-git -C "$core_root/core" checkout --detach acffd73db5b3fcffe951fdd6e2013c98b376e7fb
+git -C "$core_root/core" checkout --detach 353995a43d9f43f78e13d8b9530d262d89962068
 ```
 
 この調査環境では次のものを使いました。版は script が `--dotnet` / `--ndk-dir` の実物から確認します。
@@ -155,4 +155,4 @@ core更新はMeltype forkで上流差分と必要変更を検証しlockを検証
 
 Gitea `origin/main`を正本とし、PR・検証・マージ後の同じrevisionを公開GitHub `hogehonya/fcitx5-meltype` の `main`へfast-forwardのみで反映し、公開先の履歴を保持します。現在このrepoにCIは設定されていないため、該当する既存テスト・リンク・diff検査を実行します。今後CIを設定した場合は成功を必須とします。releaseは両main一致確認後に作成しcore/hostと検証範囲を記録します。現在、自動mirrorは設定されていません。
 
-予測対応coreはIssue #27のためacffd73へ更新。従来の設定・学習JSON形式を維持し、任意予測callback exportを追加する。古いcore providerではAndroid factoryの追加symbolを解決できないため、lock指定coreからartifactを再生成する。
+予測対応coreはIssue #27のため353995aへ更新。従来の設定・学習JSON形式を維持し、任意予測callback exportを追加する。古いcore providerではAndroid factoryの追加symbolを解決できないため、lock指定coreからartifactを再生成する。
