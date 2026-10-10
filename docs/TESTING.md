@@ -16,7 +16,7 @@
 
 APK build/checker、Python30件、bridge engine、core186件が成功。16KB ELF LOAD alignmentは確認済みですが、16KB page端末、API24下限、変換履歴以外のJSON用途、全focus/回転/記号/矢印は実機未確認。Mozc固有学習callbackは未対応。host lintは既存269件で失敗、変更ファイル0件と分離記録しています。2026-10-10 15:55 JST確認時点でcore head CI17件中Ubuntu push core1件は成功（15:55:14）、残16件はWaiting/Blocked・aggregate pending。Windows/macOS適合runnerはなく、実装3PRは依存順にmerge保留。
 
-APKは `/home/honya/Downloads/Meltype-Android-20261010/` に保管し、GitHub Release未公開。既存IMEを保持してhost25/plugin28を追加導入しました。
+この実機検証記録の時点ではAPKを `/home/honya/Downloads/Meltype-Android-20261010/` に保管し、GitHub Release未公開でした。後続の試用版公開状況は[導入案内](ANDROID-TRIAL.md)を参照してください。既存IMEを保持してhost25/plugin28を追加導入しました。
 
 以下の項目は過去のmainビルド検証と、残る受入条件です。各項目を全て実機合格したという意味ではありません。
 
@@ -103,6 +103,6 @@ S-09/VR-09のLinux受入は、実provider/Fcitx InputContext integrationと異�
 |構成・設計|3repo、入力・状態・ビルド工程、ソース所属とAPK収録の図を記述|主要方式の比較・不採用理由は不足|
 |異常時・運用|ABI異常回復の記述と受入計画あり|容量不足・辞書欠損・password/focus/回転の実機証拠は不足|
 |受入|Android3台instrumentation、Linux2testsと隔離GTKの成功記録あり|Pixel GUI、下限API、16KB page端末等は未確認|
-|変更・公開|Issue/PR/SHAとソース・APK公開状態を区別|実装PRはCI未完・未merge、APKはGitHub Release未公開|
+|変更・公開|Issue/PR/SHAとソース・APK公開状態を区別|点検時点では実装PRはCI未完・未merge、APKはGitHub Release未公開。後続の試用版は[導入案内](ANDROID-TRIAL.md)を参照|
 
 実機試用に進める実装と設計の骨格はありますが、要求全体の完了判定、異常系・非機能の証拠、実装の統合公開は未完です。上表の不足は提案・未決事項として記録し、この状態点検を根拠に追加機能や数値目標を確定しません。最新のCI・公開状態は[公開状況](../README.md#androidのビルドとapk入手)と実装PRを参照します。
