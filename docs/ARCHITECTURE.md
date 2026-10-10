@@ -187,3 +187,7 @@ pluginはGPL-3.0-or-laterとしてMeltype由来のCopyright 2026 Yukishiroと[NO
 ### Linux addonの直接英字状態
 
 `addon/engine.h`のInputContext property `State.direct` が直接英字モードを保持する。coreのNonConvert/Convert定数にはモード切替実装がないため、adapterでpending commit後に状態を変更し、直接モードの通常キーをcoreへ送らずアプリへ通す。core/session ABIやproviderを変更しない。InputMethodEngineV2のsubMode/labelで `A` と `あ` を表示する。既存reset/deactivateのcommit処理は維持しdirect状態は変更しない。
+
+### Android画面・物理キーの直接英字接続（S-10）
+
+Linuxと同じState.directを使い、NativeAOT providerは固定87b1のまま変更しない。host TextKeyboardはMeltype時のみ専用キーを表示し、native statusでsubMode.labelがAなら復帰用Henkan、通常ならMuhenkanを送る。既存SymActionのVirtual入力を使用し、未消費文字はAndroid frontendのKeyEventからIME serviceがアプリへ確定する。GenKeyMappingは物理KEYCODE_MUHENKAN/HENKANにも同じsymを割り当てる。記号面ABCのlayout移動とLanguageKeyのIME切替は独立して維持する。
