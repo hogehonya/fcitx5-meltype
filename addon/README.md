@@ -52,7 +52,7 @@ helper は絶対パス必須、profile を指定する場合も絶対パスで�
 
 文字列は UTF-8 NUL 終端、handle は入力欄ごとに一つです。結果 JSON は RAII で必ず `meltype_free` へ戻します。共有 API は Fcitx event thread 上で直列に呼びます。C++ 例外を host へ漏らさず、入力文字列をエラーログへ出しません。Native core 自体の不正 handle 保護を仮定せず、handle の作成・破棄は adapter が管理します。
 
-`commits[]` の編集、preedit、候補、候補選択、surrounding text を Fcitx UI へ反映します。Fcitx の Unicode cursor は UTF-8 の文字境界で切り、core の `deleteBefore` (UTF-16 単位) を UCS4 文字数へ変換します。サロゲート途中や取得済み文脈を超える削除は拒否します。選択範囲のある入力欄・password/sensitive 欄の文脈は渡しません。password/sensitive キーと非 BMP キーは host へそのまま通します。reset / deactivate は未確定入力を確定します。非 BMP / 未対応キーを通す前にも未確定文字を確定し、入力順序を維持します。例外時は session を破棄して UI を消し、次の入力で新規作成します。
+`commits[]` の編集、preedit、候補、候補選択、surrounding text を Fcitx UI へ反映します。Fcitx の Unicode cursor は UTF-8 の文字境界で切り、core の `deleteBefore` (UTF-16 単位) を UCS4 文字数へ変換します。サロゲート途中や取得済み文脈を超える削除は拒否します。選択範囲のある入力欄・password/sensitive 欄の文脈は渡しません。password/sensitive キーと非 BMP キーは host へそのまま通します。最初の対応keyでsessionを遅延作成します。reset / deactivate は未確定入力を確定しhandleを保持します。context property破棄でhandleを破棄します。非 BMP / 未対応キーを通す前にも未確定文字を確定し、入力順序を維持します。例外時は session を破棄して UI を消し、次の入力で新規作成します。
 入力メソッドの直接英数切り替えは Fcitx の Ctrl+Space で行います。隔離 GUI で `meltype` → `keyboard-us` → `meltype` の切り替えを確認しました。
 
 Linux では上流 `meltype_init_mozc` と既存 helper が変換・Mozc 学習を担当します。Android では共通 engine/session に [ARCHITECTURE](../docs/ARCHITECTURE.md) の callback bridge を接続し、process 実行は使いません。Android bridge の学習 callback、ABI/header 合流、packaging は未実装です。

@@ -55,3 +55,14 @@
 ## Linux addon の実行済み検証
 
 [addon/README.md](../addon/README.md) の実 NativeAOT / Fcitx InputContext integration test と、隔離 D-Bus / Xvfb の GTK 混在文入力が成功しました。Android APK と端末試験の成功を意味しません。
+
+## hostキーボードの設計受入
+
+[要求](ARCHITECTURE.md#キーボードの要求と参照)の今後のhost試験で、UI実装・APK・端末が未整備のため未実施です。
+
+- QWERTY・数字行を維持しローマ字・英語・混在入力のラベルと入力結果を照合する。
+- 主画面`@`・句読点、記号面への到達と復帰、左右矢印を確認する。
+- 候補表示とtap対象が一致しaddonへeventが届き正しい候補を確定する。
+- IME切替と配列/記号面切替のラベル・操作・結果を区別し既存入力を維持する。
+- light/dark双方でキー境界・文字・候補・選択状態が読める。日本語デザイン成果物の実装はIBM Plex Sans JPを使用する。
+- 実機画面と操作で採否を記録する。12キー/フリックは別途採用決定が必要。

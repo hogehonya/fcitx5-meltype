@@ -9,7 +9,7 @@ worker sandboxのAF_UNIX制限による失敗は[実行記録](#実行記録)で
 
 ## 固定する依存
 
-固定値の正本は [`scripts/deps.lock.json`](../scripts/deps.lock.json) です。script はこの値と実物が
+core/toolchain/ABI固定値の正本は [`scripts/deps.lock.json`](../scripts/deps.lock.json) です。host SHAはJSONに含めず下表を正本とします。script はlockの値と実物が
 一致しなければ build を始めません。値を変えるときは lock を更新し、理由と検証を Issue へ記録します。
 
 |依存|固定revision|用途|
@@ -145,7 +145,7 @@ APK packaging 側の alignment は別途確認します。[16KB公式手順](htt
 
 ## 今後追加するAPK工程
 
-1. このrepoへaddon・bridge・ABI headerを実装し、coreへ保存先等の必要変更を加える。
+1. 既存共通adapterへAndroid factory・bridgeを接続し、既存保存先APIをhostから呼ぶ。callback header・exportを照合する。coreへの保存先API再追加は不要。
 2. host forkへ固定revision参照の`plugin/meltype`を登録する。既存Mozc pluginのPrefab依存・
    addon/assets収録方法を参考にする。
 3. CMake imported shared targetでNativeAOTライブラリへリンクし、Mozc静的engine・辞書生成を
@@ -156,3 +156,9 @@ APK packaging 側の alignment は別途確認します。[16KB公式手順](htt
    [TESTING](TESTING.md)で端末検証する。
 
 [構成](ARCHITECTURE.md) / [検証](TESTING.md) / [文書一覧](README.md)
+
+## 依存更新と公開
+
+core更新はMeltype forkで上流差分と必要変更を検証しlockを検証済みrevisionへ更新します。ABIシグネチャ・実export・JSON schema・所有権の互換性とライセンスを照合し回帰試験と実buildを行います。host更新は本書のSHAとsubmodule/build条件・キーボード基準を再確認します。統合後は端末回帰試験も行い未実施はIssueへ記録します。Linux provider版は[addon](../addon/README.md)で別管理します。
+
+Gitea `origin/main`を正本としPR・CI・マージ後の同じrevisionを公開GitHub `hogehonya/fcitx5-meltype` の `main`へ反映します。releaseは両main一致確認後に作成しcore/hostと検証範囲を記録します。現在、自動mirrorは設定されていません。
