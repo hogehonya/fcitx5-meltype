@@ -98,7 +98,7 @@ void Engine::clear(fcitx::InputContext *ic) noexcept {
     } catch(...) { /* Host callbacks cannot escape an error recovery path. */ }
 }
 void Engine::recover(fcitx::InputContext *ic,State *state) noexcept {
-    if(state) { state->session.reset(); state->preedit=false; }
+    if(state) { state->session.reset(); state->preedit=false; state->alphanumericConversion=false; }
     clear(ic);
 }
 bool Engine::apply(fcitx::InputContext *ic,const nlohmann::json &value) {
@@ -139,6 +139,11 @@ bool Engine::apply(fcitx::InputContext *ic,const nlohmann::json &value) {
         }
     }
     ic->updatePreedit(); ic->updateUserInterface(fcitx::UserInterfaceComponent::InputPanel);
+    if(state->alphanumericConversion && !state->preedit && !commits.empty()) {
+        // F10 is a one-composition conversion, not an English context switch.
+        state->alphanumericConversion=false;
+        state->session.reset(); // Next composition starts with a fresh core context.
+    }
     return value.at("consumed").get<bool>();
 }
 void Engine::keyEvent(const fcitx::InputMethodEntry &,fcitx::KeyEvent &event) {
@@ -166,6 +171,11 @@ void Engine::keyEvent(const fcitx::InputMethodEntry &,fcitx::KeyEvent &event) {
             // Preserve text order when a non-BMP/unhandled key passes to the app.
             if(state->session && state->preedit) apply(ic,state->session->commit());
             return;
+        }
+        if(!key.modifiers && state->preedit) {
+            if(sym==FcitxKey_F10) state->alphanumericConversion=true;
+            else if(sym==FcitxKey_F6 || sym==FcitxKey_F7 || sym==FcitxKey_F9)
+                state->alphanumericConversion=false;
         }
         if(!state->session) state->session=std::make_unique<Session>();
         auto [before,after]=state->preedit?std::pair<std::string,std::string>{}:surrounding(ic);

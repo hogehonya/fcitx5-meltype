@@ -10,6 +10,7 @@ struct State : fcitx::InputContextProperty {
     std::unique_ptr<Session> session;
     bool preedit=false;
     bool direct=false;
+    bool alphanumericConversion=false;
 };
 struct MappedKey { int vk=0; int ch=0; int modifiers=0; };
 MappedKey mapKey(const fcitx::Key &key);

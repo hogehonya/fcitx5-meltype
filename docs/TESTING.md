@@ -142,3 +142,15 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 ## 入力途中の予測（Issue #27）
 
 core新テスト2件と全188件、Native ABI managed buildが成功。純日本語入力途中候補、tap即確定、未完ローマ字抑制、Backspace再表示、通常Space変換、provider失敗/英数を検証。bridgeの実Mozc予測・新artifact・APK GUIは統合検証待ちであり、core成功を代用しない。上行削除は意図確認まで保留。
+
+## かな・カナの一回変換（Issue #24）
+
+要求出所は2026-10-10のユーザー発言「漢字かな混じりではなくカナだけ、かなだけに変換できるようにしたい」。画面の直接英字切替キーを「かな」「カナ」に置き換え、core既存F6/F7による未確定文字列全体の読み変換を使用する。物理無変換の直接英字機能は維持する。永続かな入力モード・12key配列・英単語の日本語発音への翻訳は対象外。
+
+実core integrationは`nihongo`のlive入力/候補表示中それぞれからF6→`にほんご`、F7→`ニホンゴ`、候補消去、Enter完全一致、次入力の通常`日本語`復帰を確認する。Android instrumentation `MeltypeTest -e phase script`は画面と同じaction helperを使用し、上記に加えて直接英字から通常復帰・空のF6/F7非転送を確認する。実機結果はIssue #24へ記録する。engine/core変更なしでplugin39 APKを再利用、host/testのみ生成する。
+
+## F10の一回変換と次composition（Issue #26）
+
+2026-10-10の画面「英数」要求は未確定文字列の一回変換として採用。Pixelのlive/候補中F10確定は成功したが、続くnihongoが英字になり受入失敗。coreは表示モードをAutoへ戻しても直前英語文脈を保持するため、pluginはIC単位にF10変換を追跡し、確定後にcore sessionを破棄、次compositionで再作成する。保存データは変更・削除しない。F6/F7/F9へ変更した場合はF10追跡を解除する。物理無変換の直接英字は従来どおり。
+
+Linux実NativeAOT配布v1.0.0/helperによる2回F10確定→次nihongoのintegrationは旧engineでFAILを再現（Red）。修正後integrationと異常回復2/2 PASS（1.04秒）。初回F10一回だけではRedを再現しなかったため、実機の二回確定と一致させた。Android core87/providerは変更せずpluginのみ再生成する。Pixel修正版受入は未実行でIssue #26へ追記する。

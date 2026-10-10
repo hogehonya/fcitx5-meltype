@@ -101,6 +101,31 @@ int main() {
     fcitx::KeyEvent locks(&direct,fcitx::Key(FcitxKey_Muhenkan,fcitx::KeyStates(fcitx::KeyState::CapsLock)|fcitx::KeyState::NumLock));
     engine.keyEvent(entry,locks);
     require(locks.accepted() && engine.subModeLabel(entry,direct)=="A","lock states do not suppress mode key");
+    for(auto mode : {FcitxKey_F6,FcitxKey_F7}) {
+        for(bool candidates : {false,true}) {
+            Context kana(manager);
+            type(kana,"nihongo");
+            if(candidates) send(kana,FcitxKey_space);
+            require(send(kana,mode),"kana conversion consumed");
+            auto reading=mode==FcitxKey_F6 ? "にほんご" : "ニホンゴ";
+            require(kana.inputPanel().clientPreedit().toString()==reading,"whole composition kana conversion");
+            require(!kana.inputPanel().candidateList() || kana.inputPanel().candidateList()->empty(),"kana conversion clears candidates");
+            send(kana,FcitxKey_Return);
+            require(kana.committed==reading,"kana commit exact");
+            type(kana,"nihongo");
+            require(kana.inputPanel().clientPreedit().toString()=="日本語","kana conversion is not persistent");
+        }
+    }
+    Context alphanumeric(manager);
+    for(int n=0;n<2;++n) {
+        type(alphanumeric,"nihongo");
+        require(send(alphanumeric,FcitxKey_F10),"F10 consumed");
+        require(alphanumeric.inputPanel().clientPreedit().toString()=="nihongo","half width preedit");
+        send(alphanumeric,FcitxKey_Return);
+    }
+    require(alphanumeric.committed=="nihongonihongo","half width exact commits");
+    type(alphanumeric,"nihongo");
+    require(alphanumeric.inputPanel().clientPreedit().toString()=="日本語","F10 does not carry English context to next composition");
     std::cout<<"real NativeAOT/Fcitx context integration PASS\n";
  } catch(const std::exception &e) { std::cerr<<e.what()<<"\n";return 1; }
 }
