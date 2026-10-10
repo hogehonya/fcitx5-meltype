@@ -1,6 +1,7 @@
 # 実装後の検証
 
-以下はAndroid実装の受入条件と実行記録です。Android 12/16/17のarm64実機で下記の項目が成功しました。他環境と未実施項目は区別し、Linuxの結果をAndroidの合格証拠に流用しません。
+以下はAndroid実装の受入条件と実行記録です。過去の検証結果と未実施項目は区別し、Linux結果をAndroidの合格証拠に流用しません。
+
 
 ## ビルド成果物の検証 (自動)
 
@@ -129,6 +130,16 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 |構成・設計|3repo、入力・状態・ビルド工程、ソース所属とAPK収録の図を記述|主要方式の比較・不採用理由は不足|
 |異常時・運用|ABI異常回復の記述と受入計画あり|容量不足・辞書欠損・password/focus/回転の実機証拠は不足|
 |受入|Android3台instrumentation、Linux2testsと隔離GTKの成功記録あり|Pixel GUI、下限API、16KB page端末等は未確認|
-|変更・公開|Issue/PR/SHAとソース・APK公開状態を区別|実装PRはCI未完・未merge、APKはGitHub Release未公開|
+|変更・公開|Issue/PR/SHAとソース・APK公開状態を区別|点検時点では実装PRはCI未完・未merge、APKはGitHub Release未公開。後続の試用版は[導入案内](ANDROID-TRIAL.md)を参照|
 
 実機試用に進める実装と設計の骨格はありますが、要求全体の完了判定、異常系・非機能の証拠、実装の統合公開は未完です。上表の不足は提案・未決事項として記録し、この状態点検を根拠に追加機能や数値目標を確定しません。最新のCI・公開状態は[公開状況](../README.md#androidのビルドとapk入手)と実装PRを参照します。
+
+## Linux 英字直接入力の検証（Issue #20）
+
+2026-10-10、Linux配布v1.0.0 provider/helper、Fcitx5 5.1.12、G++14.2.0を同じ固定入力として使用。新受入testを旧engineへ適用すると `Muhenkan consumed` でintegration失敗（Red）、実装後はctest 2/2成功。直接キーpass-through、通常Meltype復帰、context独立、pending/候補の一回commit、release/修飾キー保持、mode表示/解除後保持を検証した。`addon/README.md`のcmake/ctest手順を利用し、HOME/Mozc profileは `/home/honya/tmp/fcitx5-english-mode/green-home` に隔離した。GUI検証は別途Issue #20へ記録し、ここで実行済みとは扱わない。既存Android APK・対応ソースassetは変更しない。
+
+## Android未確定文字列のかな変換（Issue #24）
+
+要求出所は2026-10-10のユーザー発言「漢字かな混じりではなくカナだけ、かなだけに変換できるようにしたい」。画面の直接英字切替キーを「かな」「カナ」に置き換え、core既存F6/F7による未確定文字列全体の読み変換を使用する。物理無変換の直接英字機能は維持する。永続かな入力モード・12key配列・英単語の日本語発音への翻訳は対象外。
+
+実core integrationは`nihongo`のlive入力/候補表示中それぞれからF6→`にほんご`、F7→`ニホンゴ`、候補消去、Enter完全一致、次入力の通常`日本語`復帰を確認する。Android instrumentation `MeltypeTest -e phase script`は画面と同じaction helperを使用し、上記に加えて直接英字から通常復帰・空のF6/F7非転送を確認する。実機結果はIssue #24へ記録する。engine/core変更なしでplugin39 APKを再利用、host/testのみ生成する。

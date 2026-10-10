@@ -1,6 +1,6 @@
 # 要件定義
 
-[要求定義](REQUIREMENTS.md)を、実装で判定できる条件へ分解する。S-01/S-08とNFは共通の責務・文書・制約、S-02〜07はAndroid、S-09はLinux addonの仕様です。Androidは検証済み実装ブランチを対象とし、mainへ全コードが反映済みという意味ではありません。実測と未確認範囲の正本は[TESTING](TESTING.md)、固定ビルド入力の正本は[BUILD](BUILD.md)。
+[要求定義](REQUIREMENTS.md)を、実装で判定できる条件へ分解する。S-01/S-08とNFは共通の責務・文書・制約、S-02〜07/S-10はAndroid、S-09はLinux addonの仕様です。Androidは検証済み実装ブランチを対象とし、mainへ全コードが反映済みという意味ではありません。実測と未確認範囲の正本は[TESTING](TESTING.md)、固定ビルド入力の正本は[BUILD](BUILD.md)。
 
 ## 機能要件と受入
 
@@ -30,3 +30,11 @@
 Settings/UserModel/LanguageMemory/TranslationDictionary等、変換履歴以外のNativeAOT JSON読書きは未実機検証。readonly/容量不足、password欄、非BMP cursor、hardware入力、回転・focus網羅試験も未確認。host lintの既存失敗は別記し、本変更の検証成功へ混ぜない。Release公開やCI runner新設はこの文書整理に含めない。
 
 [基本設計と図](ARCHITECTURE.md) / [受入実績](TESTING.md) / [文書一覧](README.md)
+
+### S-09の英字直接入力（Issue #20）
+
+未修飾の無変換で入力context単位の直接英字モードへ移る。入力順を維持するため未確定文字・選択中候補を一回確定する。通常キーはアプリへ渡し、Meltype IM選択は維持する。変換/ひらがなで既存の英日自動判定へ戻る。状態表示は直接 `A`、通常 `あ`。モードはreset/deactivate後も同じcontextで保持し、新contextは通常モード。修飾付きモードキー・release・password/sensitive入力は取得しない。VR-09は上記の独立context、pass-through、復帰、二重確定防止を実providerテストで検証する。Android APKへの反映・実機確認は今回の受入範囲外。
+
+### S-10 / VR-10: Android英字直接入力（Issue #22）
+
+[Android反映要求](REQUIREMENTS.md#android英字モード反映issue-22)に対応する。S-09英字状態のshared engineをAndroidにも適用し、hostはMeltype選択時だけABC/かなキーを表示して無変換/変換symを送る。物理Androidキーcodeも対応symへ変換する。既存LanguageKey/数字記号ABCを維持。VR-10は `MeltypeTest -e phase english` のpendingcommit・Virtual文字とSpace完全一致・Meltype/A保持・復帰日本語/あ・物理mapping、および画面キー表示/タップ確認。通常/reloadを回帰し、実行結果はTESTING/Issue #22へ記録する。
