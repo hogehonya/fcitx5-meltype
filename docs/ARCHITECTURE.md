@@ -183,3 +183,7 @@ pluginはGPL-3.0-or-laterとしてMeltype由来のCopyright 2026 Yukishiroと[NO
 寸法・設定・既存設定保持はhostの`HONYA.md`、`ThemePrefs.kt`、`KeyView.kt`が正本。キーボードのタッチ領域は維持し、外観のinsetだけを調整する。12キー/フリックの採用は未決定であり、今回のQWERTY実装に含めない。[受入](TESTING.md#hostキーボードの設計受入)で入力結果・候補tap・明暗を確認する。
 
 [ビルド](BUILD.md) / [検証](TESTING.md) / [文書一覧](README.md)
+
+### Linux addonの直接英字状態
+
+`addon/engine.h`のInputContext property `State.direct` が直接英字モードを保持する。coreのNonConvert/Convert定数にはモード切替実装がないため、adapterでpending commit後に状態を変更し、直接モードの通常キーをcoreへ送らずアプリへ通す。core/session ABIやproviderを変更しない。InputMethodEngineV2のsubMode/labelで `A` と `あ` を表示する。既存reset/deactivateのcommit処理は維持しdirect状態は変更しない。

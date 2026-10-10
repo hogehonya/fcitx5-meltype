@@ -2,6 +2,7 @@
 
 要求→要件→基本設計→ビルド→検証の順に参照します。mainにはLinux addonとNativeAOT build入口があり、Android完成版は検証済み未mergeブランチです。実装済み・公開済み・未確認の区別は[入口](../README.md)に示します。
 
+- [ANDROID-TRIAL.md](ANDROID-TRIAL.md): 試用版入手・導入・制限・対応ソース
 - [REQUIREMENTS.md](REQUIREMENTS.md): R-ID、要求者・日時・出所、目的と採用経緯
 - [SPECIFICATIONS.md](SPECIFICATIONS.md): S/NF-ID、VR受入対応、確認済み・未確認範囲
 - [ARCHITECTURE.md](ARCHITECTURE.md): 基本設計、3repo構成、ABI、初期化・変換・学習の図

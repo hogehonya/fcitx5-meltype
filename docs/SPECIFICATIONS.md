@@ -30,3 +30,7 @@
 Settings/UserModel/LanguageMemory/TranslationDictionary等、変換履歴以外のNativeAOT JSON読書きは未実機検証。readonly/容量不足、password欄、非BMP cursor、hardware入力、回転・focus網羅試験も未確認。host lintの既存失敗は別記し、本変更の検証成功へ混ぜない。Release公開やCI runner新設はこの文書整理に含めない。
 
 [基本設計と図](ARCHITECTURE.md) / [受入実績](TESTING.md) / [文書一覧](README.md)
+
+### S-09の英字直接入力（Issue #20）
+
+未修飾の無変換で入力context単位の直接英字モードへ移る。入力順を維持するため未確定文字・選択中候補を一回確定する。通常キーはアプリへ渡し、Meltype IM選択は維持する。変換/ひらがなで既存の英日自動判定へ戻る。状態表示は直接 `A`、通常 `あ`。モードはreset/deactivate後も同じcontextで保持し、新contextは通常モード。修飾付きモードキー・release・password/sensitive入力は取得しない。VR-09は上記の独立context、pass-through、復帰、二重確定防止を実providerテストで検証する。Android APKへの反映・実機確認は今回の受入範囲外。

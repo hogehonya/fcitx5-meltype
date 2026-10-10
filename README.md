@@ -1,6 +1,6 @@
 # Meltype Fcitx5 plugin (Linux / Android)
 
-Meltypeの日本語・英語混在入力をFcitx5へ接続するLinux / Androidプラグインです。ソースの開発正本は [Gitea fcitx5-meltype](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype)、GitHub公開先は [hogehonya/fcitx5-meltype](https://github.com/hogehonya/fcitx5-meltype) です。
+原作はYukishiro（@yksr_melt / GitHub: [yksr-melt](https://github.com/yksr-melt)）による [Meltype](https://github.com/yksr-melt/Meltype) です。このリポジトリは日本語・英語混在入力をFcitx5へ接続するLinux / Android向け移植・連携版で、上流公式配布ではありません。ソースの開発正本は [Gitea fcitx5-meltype](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype)、GitHub公開先は [hogehonya/fcitx5-meltype](https://github.com/hogehonya/fcitx5-meltype) です。
 
 ## 3リポジトリの役割
 
@@ -24,7 +24,7 @@ Meltypeの日本語・英語混在入力をFcitx5へ接続するLinux / Android�
 - [検証済み固定依存とNativeAOT生成](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/docs/BUILD.md)。既存dirty cloneを使わず独立checkoutでビルドします。
 - [実機結果・SHA256・制限](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/docs/TESTING.md)。16KB page端末と他のJSON保存用途は実機未確認です。
 
-APKは作業ホストの `/home/honya/Downloads/Meltype-Android-20261010/` に保管しています。host・pluginを組で導入し、テストAPKは検証時に使用します。**GitHub ReleaseでのAPK公開はまだ行っていません。** このローカルパスは外部からのダウンロードURLではありません。上流Fcitx5 AndroidのRelease APKにこのMeltype統合が含まれるとは扱いません。
+試用版の入手先・公開状態は[android-v0.1.0-alpha.1 のPre-releaseページ](https://github.com/hogehonya/fcitx5-meltype/releases/tag/android-v0.1.0-alpha.1)を参照してください。[導入・制限・対応ソースの案内](docs/ANDROID-TRIAL.md)に沿って、ライセンス付き導入ZIPのhost・pluginを組で導入します。stable版ではなくdebug署名です。上流Fcitx5 AndroidのRelease APKにこの統合が含まれるとは扱いません。元の検証済みAPKは作業ホストの `/home/honya/Downloads/Meltype-Android-20261010/` に保管しています。
 
 ## 設計・検証
 
