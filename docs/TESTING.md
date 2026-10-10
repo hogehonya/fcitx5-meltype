@@ -60,7 +60,7 @@ S-09/VR-09のLinux受入は、実provider/Fcitx InputContext integrationと異�
 
 ## hostキーボードの設計受入
 
-既存host UIを基準にした[要求](ARCHITECTURE.md#キーボードの要求と参照)の今後の試験です。Gboard/ATOKを参考にする新設計と、Meltypeを統合したAndroid host・APKを生成済みです。下記に実機で確認した結果を記録します。buildと実行手順は[Android手順](../android/README.md)を参照してください。
+既存host UIを基準にした[要求](ARCHITECTURE.md)の今後の試験です。Gboard/ATOKを参考にする新設計と、Meltypeを統合したAndroid host・APKを生成済みです。下記に実機で確認した結果を記録します。buildと実行手順は[Android手順](../android/README.md)を参照してください。
 
 - QWERTY・数字行を維持しローマ字・英語・混在入力のラベルと入力結果を照合する。
 - 主画面`@`・句読点、記号面への到達と復帰、左右矢印を確認する。

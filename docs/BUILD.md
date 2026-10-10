@@ -92,7 +92,7 @@ restore するには取得先が必要です。既存`linux/build.sh`と同様�
 
 `manifest.json` は最後に書きます。途中で失敗したら `--output-dir` ごと削除し、非 0 で終わります
 (成功 manifest を残さない)。終了コードは 0=成功、1=失敗、2=引数の誤りです。この成果物は APK では
-なく、addon への収録と端末検証は[今後追加するAPK工程](#今後追加するapk工程)です。
+なく、addon への収録と端末検証は[Android APK工程](#android-apk工程)です。
 
 ## 実行記録
 
