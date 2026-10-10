@@ -69,7 +69,7 @@ script の手順は次のとおりです。引数の一覧は [scripts/README.md
 1. `--output-dir` が存在しないこと、core の SHA が lock と一致し作業ツリーが clean であること、
    `dotnet --version` と NDK の `Pkg.Revision` が lock と一致すること、core の
    `InvariantGlobalization=false` が維持されていることを確認する。output-dir は core の中に置かない。
-2. `--output-dir/staging` へ core の追跡ファイルだけを `git archive` で取り出す (元 core へは書かない)。
+2. `--output-dir/staging` へ core の追跡ファイルだけを `git archive` で取り出す (元 core へは書かない)。隔離csprojへ `LinkerArg=-Wl,-soname,libMeltypeNative.so` を加え、Bionicのversioned symbol lookupで必要なSONAMEを付ける。
 3. NDK の LLVM bin を `PATH` の先頭に置き、`DOTNET_CLI_TELEMETRY_OPTOUT=1` で publish する。
 
 ```bash
@@ -86,7 +86,7 @@ restore するには取得先が必要です。既存`linux/build.sh`と同様�
 4. `llvm-readelf` で `ELF64` / `AArch64` / `DYN` と little endian、必須 export 9 個
    (`meltype_init` / `meltype_create` / `meltype_destroy` / `meltype_handle_key` / `meltype_commit` /
    `meltype_select_candidate` / `meltype_set_direct` / `meltype_free` / `meltype_set_data_directory`)、
-   全 `LOAD` の `p_align >= 16384` を検証する。`SONAME` と `NEEDED` は記録する。
+   全 `LOAD` の `p_align >= 16384`、`SONAME=libMeltypeNative.so` を検証する。`SONAME` と `NEEDED` は記録する。
 5. `lib/arm64-v8a/libMeltypeNative.so`、`manifest.json`、`LICENSE` と `THIRD-PARTY-NOTICES.md` の原本、
    `logs/publish.log` (IL2026/IL3050 の JSON AOT 警告を含む)、`README.md` を残す。
 

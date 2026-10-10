@@ -50,8 +50,10 @@ adb -s SERIAL shell am instrument -w -e phase reload \
 
 テストは Fcitx の同じnative経路で `nihongo` →候補選択→ `日本語` commit と、`kyouhagithubnipushshita` → Return → `今日はgithubにpushした` の完全一致を確認します。また、`hashi` の非既定漢字候補を選び、JSONに保存した値を確認します。`phase reload` は別process起動で同じ読みのlive preeditとcommitが学習した候補へ戻ることを確認します。実機でbackspace、端末rotation、ICU初期化を別途確認します。端末未実施の検証をAPKビルド成功だけで成功扱いしません。Mozc固有学習はcallback ABIに公開されていないため未対応です。
 
-2026-10-10 の統合ビルドで host、plugin、instrumentation APK の生成が成功しました。plugin checker は arm64-only、NativeAOT/addon収録、Fcitx/STL重複無し、ELF 16KB LOAD alignment、正規asset/config descriptor、DT_NEEDED basename、`RUNPATH=$ORIGIN` が成功しています。Python単体29件と既存bridge実engine試験も成功しています。端末の検証結果は実行後に追記します。
+2026-10-10 の統合ビルドで host、plugin、instrumentation APK の生成が成功しました。plugin checker は arm64-only、NativeAOT/addon収録、Fcitx/STL重複無し、ELF 16KB LOAD alignment、正規asset/config descriptor、DT_NEEDED basename、`RUNPATH=$ORIGIN` が成功しています。Python単体30件と既存bridge実engine試験も成功しています。端末の検証結果は実行後に追記します。
 
 ## 成果の出所
 
 今回統合した source snapshot は `snapshot-provenance.json` に元worktreeとSHA256を記録しています。元worktreeには書き込みません。生成されたビルドfileをsource snapshotには含めません。
+
+実機ロードでproviderのSONAME欠落によりBionicのsymbol version lookupが失敗することを確認したため、NativeAOTの隔離publish入力にSONAME linker argを追加しました。APK checkerにもprovider SONAMEとVERNEED/DT_NEEDED整合検査を追加しています。既存provider成果物は変更せず、正式build scriptで再生成します。

@@ -66,6 +66,14 @@ def check(apk, readelf):
             output.write_bytes(raw)
             dynamic = subprocess.check_output([str(readelf), "-d", str(output)], text=True)
             needed = re.findall(r"NEEDED.*\[([^]]+)\]", dynamic)
+            versions = subprocess.check_output([str(readelf), "--version-info", str(output)], text=True)
+            version_providers = re.findall(r"\bFile:\s*(\S+)", versions)
+            if set(version_providers) - set(needed):
+                raise ValueError(f"Symbol version providers are absent from DT_NEEDED in {name}: {version_providers}")
+            if output.name == "libMeltypeNative.so":
+                sonames = re.findall(r"SONAME.*\[([^]]+)\]", dynamic)
+                if sonames != ["libMeltypeNative.so"]:
+                    raise ValueError(f"Bionic requires the NativeAOT provider SONAME: {sonames}")
             if any("/" in library for library in needed):
                 raise ValueError(f"Build-path dependency in {name}: {needed}")
             if output.name == "libmeltype.so":
