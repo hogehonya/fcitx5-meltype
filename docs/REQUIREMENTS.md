@@ -20,6 +20,6 @@ Meltypeの英日混在入力をFcitx5で使用し、Android端末でも入力・
 
 NativeAOT、arm64-v8a先行、Androidのin-process MozcはAgentによる実装判断として採用・検証した。ユーザーの初期要求そのものと混同しない。Gboard/ATOKの完全な複製、12キー/フリックの採用、他ABI対応、GitHub APK Release公開は確定要求に含めない。
 
-Android実装は検証済みブランチにあり、mainへ未merge。core head CI17件未開始（Windows/macOS適合runner無し、Linux待機原因未特定）による待機は残作業で、実機成功をCI成功へ置き換えない。Pixel 7のGUI確認は端末解除待ち。[現状と検証](TESTING.md#2026-10-10のandroid受入結果)を参照する。
+Android実装は検証済みブランチにあり、mainへ未merge。core head CI17件未開始（Windows/macOS適合runner無し、Linux待機原因未特定）による待機は残作業で、実機成功をCI成功へ置き換えない。Pixel 7のGUI確認は端末解除待ち。[現状と検証](TESTING.md)を参照する。
 
 [要件と受入対応](SPECIFICATIONS.md) / [基本設計](ARCHITECTURE.md) / [文書一覧](README.md)

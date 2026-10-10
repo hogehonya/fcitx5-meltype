@@ -105,7 +105,7 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 - F-52E `ZH2AA2PQFB`、Android 16、arm64-v8a: USBで上記配布host/plugin/test APKを `install -r`、すべて成功。通常instrumentation PASS（1.549秒）、別process reload PASS（0.968秒）。light GUIでMeltypeを選択し、`nihongo`→`日本語`候補表示と確定を確認。証拠は `/tmp/meltype-f52e-nihongo.png` と `/tmp/meltype-f52e-commit.png`。
 - Pixel 7 `29081FDH200DGG`、Android 17、arm64-v8a（2026-10-10 15:20 JST追記）: 同じhost/plugin APKはUSB指定前に無線ADBで導入済み。USB指定後は無線操作を停止し、USB接続に切り替えてtest APKを導入。通常instrumentation PASS（1.490秒）、別process reload PASS（0.985秒）。USBでFcitxのIME enable/set成功、有効かつ既定IMEであることを確認。本体/pluginは先の導入を継続使用しています。GUIはユーザーへの解除依頼中で、確認時点ではkeyguard showing=true・画面OFFのためタップ操作を未確認です。解除後のGUI結果はこの正本へ追記予定です。
 
-core PR #8はWindows/macOS runner不足で既存head CIが未実行のため、core→plugin→hostの依存順mergeは保留です。今回の端末追加でソースをmerge済みとは扱いません。未mergeのbranches/worktreesと配布APKを保持します。
+core PR #8のhead CI17件は未開始です。Windows/macOS適合runnerはなく、Linux待機原因は未特定です。このため、core→plugin→hostの依存順mergeは保留です。今回の端末追加でソースをmerge済みとは扱いません。未mergeのbranches/worktreesと配布APKを保持します。
 
 ## 要件との対応
 
