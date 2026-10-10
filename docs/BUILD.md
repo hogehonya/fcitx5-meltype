@@ -14,7 +14,7 @@ core/toolchain/ABI固定値の正本は [`scripts/deps.lock.json`](../scripts/de
 
 |依存|固定revision|用途|
 |---|---|---|
-|[Meltype fork](https://gitea.honya.dev/honya-dev-forks/meltype/src/commit/9c84625e894f50f06cafba1c6aada5eaa65208f4)|`9c84625e894f50f06cafba1c6aada5eaa65208f4`|net10.0 core、C ABI。NativeAOT build の入力|
+|[Meltype fork](https://gitea.honya.dev/honya-dev-forks/meltype/src/commit/87b1ae13e95144266f9e69d8b20d42f00aa0e26e)|`87b1ae13e95144266f9e69d8b20d42f00aa0e26e`|net10.0 core、C ABI。NativeAOT build の入力|
 |.NET SDK|`10.0.100`|NativeAOT の publish|
 |Android NDK|`28.0.13004108`|Bionic arm64 のリンクと `llvm-readelf` による検証|
 |RID / ABI|`linux-bionic-arm64` / `arm64-v8a`|build と成果物の対象|
@@ -44,7 +44,7 @@ clean な作業ツリーを渡します。毎回新しい場所へ clone し、�
 set -euo pipefail
 core_root=$(mktemp -d "${TMPDIR:-/tmp}/meltype-core.XXXXXXXX")
 git clone https://gitea.honya.dev/honya-dev-forks/meltype.git "$core_root/core"
-git -C "$core_root/core" checkout --detach 9c84625e894f50f06cafba1c6aada5eaa65208f4
+git -C "$core_root/core" checkout --detach 87b1ae13e95144266f9e69d8b20d42f00aa0e26e
 ```
 
 この調査環境では次のものを使いました。版は script が `--dotnet` / `--ndk-dir` の実物から確認します。
