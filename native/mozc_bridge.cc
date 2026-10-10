@@ -36,6 +36,19 @@ class Bridge {
       .SetRequestView(request_).SetConfigView(config_).SetOptions(std::move(options)).Build();
     return converter_->StartConversion(request, segments);
   }
+  bool Predict(const char* reading, mozc::Segments* segments) {
+    if (!reading || !*reading) return false;
+    composer_.Reset();
+    composer_.SetPreeditTextForTestOnly(reading);
+    mozc::ConversionRequest::Options options = {
+      .request_type = mozc::ConversionRequest::PREDICTION,
+      .max_dictionary_prediction_candidates_size = 20,
+      .create_partial_candidates = false,
+    };
+    auto request = mozc::ConversionRequestBuilder().SetComposer(composer_)
+      .SetRequestView(request_).SetConfigView(config_).SetOptions(std::move(options)).Build();
+    return converter_->StartPrediction(request, segments);
+  }
  private:
   std::unique_ptr<mozc::Engine> engine_;
   const mozc::commands::Request request_;
@@ -99,6 +112,21 @@ extern "C" char* meltype_mozc_candidates(const char* reading) {
     }
     const auto& segment=segments.conversion_segment(0);
     for (size_t i=0; i<segment.candidates_size(); ++i) {
+      if (!text.empty()) text+='\n';
+      text+=segment.candidate(i).value;
+    }
+    return Copy(text);
+  } catch (...) { return nullptr; }
+}
+
+extern "C" char* meltype_mozc_predictions(const char* reading) {
+  try {
+    mozc::Segments segments;
+    if (!bridge || !bridge->Predict(reading, &segments) || segments.conversion_segments_size()!=1) return nullptr;
+    const auto& segment=segments.conversion_segment(0);
+    std::string text;
+    for (size_t i=0; i<segment.candidates_size() && i<20; ++i) {
+      if (segment.candidate(i).value.empty()) continue;
       if (!text.empty()) text+='\n';
       text+=segment.candidate(i).value;
     }

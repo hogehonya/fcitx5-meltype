@@ -20,6 +20,7 @@ public:
             std::filesystem::create_directories(profile);
             if(!meltype_mozc_bridge_init(profile.c_str())) throw std::runtime_error("Mozc bridge initialization failed");
             if(!meltype_init(meltype_mozc_clauses,meltype_mozc_candidates,nullptr)) throw std::runtime_error("Callback initialization failed");
+            meltype_set_prediction_callback(meltype_mozc_predictions);
             return new meltype::Engine(manager->instance()->inputContextManager());
         } catch(const std::exception &) {
             // Input text and private storage paths are never written to logs.

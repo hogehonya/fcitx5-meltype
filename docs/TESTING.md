@@ -16,6 +16,7 @@
 - `llvm-readelf` で `ELF64` / `AArch64` / `DYN` (little endian) である
 - `meltype_init` / `meltype_create` / `meltype_destroy` / `meltype_handle_key` / `meltype_commit` /
   `meltype_select_candidate` / `meltype_set_direct` / `meltype_free` / `meltype_set_data_directory`
+ / `meltype_set_prediction_callback`
   が定義済みシンボルとして export されている (`meltype_init@@V1.0` のような版付きも可)
 - すべての `LOAD` セグメントの `p_align` が 16384 以上
 - 成果物の SHA256 が manifest の記録と一致し、元 core に build 出力が残っていない
@@ -137,3 +138,7 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 ## Linux 英字直接入力の検証（Issue #20）
 
 2026-10-10、Linux配布v1.0.0 provider/helper、Fcitx5 5.1.12、G++14.2.0を同じ固定入力として使用。新受入testを旧engineへ適用すると `Muhenkan consumed` でintegration失敗（Red）、実装後はctest 2/2成功。直接キーpass-through、通常Meltype復帰、context独立、pending/候補の一回commit、release/修飾キー保持、mode表示/解除後保持を検証した。`addon/README.md`のcmake/ctest手順を利用し、HOME/Mozc profileは `/home/honya/tmp/fcitx5-english-mode/green-home` に隔離した。GUI検証は別途Issue #20へ記録し、ここで実行済みとは扱わない。既存Android APK・対応ソースassetは変更しない。
+
+## 入力途中の予測（Issue #27）
+
+core新テスト2件と全188件、Native ABI managed buildが成功。純日本語入力途中候補、tap即確定、未完ローマ字抑制、Backspace再表示、通常Space変換、provider失敗/英数を検証。bridgeの実Mozc予測・新artifact・APK GUIは統合検証待ちであり、core成功を代用しない。上行削除は意図確認まで保留。

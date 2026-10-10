@@ -8,6 +8,7 @@ extern "C" {
  * Core results must be released by meltype_free. Serialized Fcitx thread only.
  * Session handles belong to core; destroy once, never use after destruction. */
 int meltype_init(char *(*clauses)(const char *, const char *), char *(*candidates)(const char *), int (*is_word)(const char *));
+void meltype_set_prediction_callback(char *(*predictions)(const char *));
 int meltype_init_mozc(const char *helper, const char *profile);
 int meltype_set_data_directory(const char *absolute_path);
 void *meltype_create(void);

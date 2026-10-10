@@ -21,3 +21,9 @@ host LinuxのRelease buildとctest 1/1は成功しています。Android cross b
 bridge_testは未初期化、相対path拒否、繰返し初期化/終了、異なるprofile拒否、日本語文節、複数候補、空/NULL入力、反復malloc/freeを実測します。APK load・既存Mozcとの同process共存・UI操作はhost統合後の端末検証です。
 
 [構成](../docs/ARCHITECTURE.md) / [ビルド](../docs/BUILD.md) / [検証](../docs/TESTING.md)
+
+## 入力途中の予測（Issue #27）
+
+`meltype_mozc_predictions`はMozc `StartPrediction` / PREDICTIONを使い、日本語の入力途中に最大20件の全文候補を返す。部分候補は無効、複数segment結果は返さない。既存StartConversion callbackを置換しない。Android factoryはcoreの任意export `meltype_set_prediction_callback`へ登録するため、予測対応core revisionのartifactが必須。保存値やユーザー辞書は変更しない。非変換viewの非空候補もFcitxへ渡す。hostのtoolbarは既存の同一行で候補へ自動置換され、上行削除は別途確認まで保留する。core日本語候補tapは即確定し、通常Space変換の候補選択は既存どおり。
+
+bridge_testに「にほ」入力の「日本」予測と反復free、続く通常変換回帰を追加。core・bridge・APK/GUIは別の証拠として検証する。

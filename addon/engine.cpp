@@ -128,7 +128,7 @@ bool Engine::apply(fcitx::InputContext *ic,const nlohmann::json &value) {
         state->preedit=!text.empty();
         panel.setAuxUp(fcitx::Text(view.at("hint").get<std::string>()));
         auto candidates=view.at("candidates").get<std::vector<std::string>>();
-        if(view.at("converting").get<bool>() && candidates.size()>1) {
+        if(!candidates.empty()) {
             auto list=std::make_unique<fcitx::CommonCandidateList>();
             list->setPageSize(9); list->setLayoutHint(fcitx::CandidateLayoutHint::Vertical);
             list->setLabels();
