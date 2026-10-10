@@ -126,6 +126,22 @@ int main() {
     require(alphanumeric.committed=="nihongonihongo","half width exact commits");
     type(alphanumeric,"nihongo");
     require(alphanumeric.inputPanel().clientPreedit().toString()=="日本語","F10 does not carry English context to next composition");
+    Context englishContext(manager);
+    for(int n=0;n<2;++n) { type(englishContext,"hello"); send(englishContext,FcitxKey_Return); }
+    type(englishContext,"nihongo");
+    const auto englishContinuation=englishContext.inputPanel().clientPreedit().toString();
+    for(bool erase : {false,true}) {
+        Context cancelled(manager);
+        type(cancelled,"nihongo"); send(cancelled,FcitxKey_F10);
+        if(erase) for(int n=0;n<7;++n) send(cancelled,FcitxKey_BackSpace);
+        else send(cancelled,FcitxKey_Escape);
+        require(cancelled.inputPanel().clientPreedit().empty(),"cancel F10 clears composition");
+        require(cancelled.committed.empty(),"cancel F10 does not commit text");
+        for(int n=0;n<2;++n) { type(cancelled,"hello"); send(cancelled,FcitxKey_Return); }
+        require(cancelled.committed=="hellohello","normal commits after F10 cancel");
+        type(cancelled,"nihongo");
+        require(cancelled.inputPanel().clientPreedit().toString()==englishContinuation,"F10 cancellation preserves subsequent normal English context");
+    }
     std::cout<<"real NativeAOT/Fcitx context integration PASS\n";
  } catch(const std::exception &e) { std::cerr<<e.what()<<"\n";return 1; }
 }

@@ -140,10 +140,13 @@ bool Engine::apply(fcitx::InputContext *ic,const nlohmann::json &value) {
         }
     }
     ic->updatePreedit(); ic->updateUserInterface(fcitx::UserInterfaceComponent::InputPanel);
-    if(state->alphanumericConversion && !state->preedit && !commits.empty()) {
-        // F10 is a one-composition conversion, not an English context switch.
+    if(state->alphanumericConversion && !state->preedit) {
         state->alphanumericConversion=false;
-        state->session.reset(); // Next composition starts with a fresh core context.
+        // A cancelled conversion must not affect the next normal commit.
+        if(!commits.empty()) {
+            // F10 is a one-composition conversion, not an English context switch.
+            state->session.reset();
+        }
     }
     return value.at("consumed").get<bool>();
 }

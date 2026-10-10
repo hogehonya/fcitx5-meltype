@@ -154,3 +154,5 @@ core予測3件と全189件、Native ABI managed build、plugin Python30件が成
 2026-10-10の画面「英数」要求は未確定文字列の一回変換として採用。Pixelのlive/候補中F10確定は成功したが、続くnihongoが英字になり受入失敗。coreは表示モードをAutoへ戻しても直前英語文脈を保持するため、pluginはIC単位にF10変換を追跡し、確定後にcore sessionを破棄、次compositionで再作成する。保存データは変更・削除しない。F6/F7/F9へ変更した場合はF10追跡を解除する。物理無変換の直接英字は従来どおり。
 
 Linux実NativeAOT配布v1.0.0/helperによる2回F10確定→次nihongoのintegrationは旧engineでFAILを再現（Red）。修正後integrationと異常回復2/2 PASS（1.04秒）。初回F10一回だけではRedを再現しなかったため、実機の二回確定と一致させた。Android core87/providerは変更せずpluginのみ再生成する。Pixel修正版受入は未実行でIssue #26へ追記する。
+
+F10取消の独立レビュー指摘を修正：Escape/全Backspaceで未確定文字列が空になった場合は追跡フラグのみ解除し、sessionと通常入力文脈は保持する。両取消ケースで確定なし、その後の通常英語入力文脈がF10を使わない基準ICと一致することを実coreで確認。integration/異常回復2/2 PASS（1.37秒）。
