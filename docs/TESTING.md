@@ -141,7 +141,7 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 
 ## 入力途中の予測（Issue #27）
 
-core初期2件と全188件（F6/F7修正後の予測3件も成功）、Native ABI managed buildが成功。純日本語入力途中候補、tap即確定、未完ローマ字抑制、Backspace再表示、通常Space変換、provider失敗/英数を検証。bridgeの実Mozc予測・新artifact・APK GUIは統合検証待ちであり、core成功を代用しない。上行削除は意図確認まで保留。
+core予測3件と全189件、Native ABI managed build、plugin Python30件が成功。純日本語入力途中候補、tap即確定、未完ローマ字抑制、Backspace再表示、通常Space変換、provider失敗/英数を検証。新bridge sourceを隔離/tmp objectへcompileし、既存の固定Mozc archivesとlinkした実engine試験で「にほ」→「日本」包含、NULL/空入力、反復20回の予測freeと通常変換回帰が成功。上流deprecated警告、空の隔離profileに対する未作成辞書/historyログを記録。新artifact・APK GUIは統合担当が別途検証し、core/bridge成功を代用しない。上行削除は意図確認まで保留。
 
 ## かな・カナの一回変換（Issue #24）
 
