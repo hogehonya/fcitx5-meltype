@@ -1,6 +1,24 @@
-# 実装後の検証
+# 検証と受入条件
 
-以下はAndroid実装後の受入条件です。現在はAPKがなく、どの条件もAndroid上で成功確認していません。Linuxでの動作をAndroidの合格証拠に流用しません。
+以下に2026-10-10の実機結果と継続する受入条件を示します。Androidコードは検証済み未mergeブランチにあり、このmainのコードだけで同じAPKを作れるとは扱いません。Linuxの動作をAndroidの証拠に流用しません。
+
+## 2026-10-10のAndroid受入結果
+
+[要件・VR対応](SPECIFICATIONS.md)のVR-02〜07を検証しました。詳しい実行記録・成果物SHA256は[plugin14cbeaaの検証正本](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/docs/TESTING.md)を参照します。
+
+|端末・接続|通常phase / 別process reload|GUI確認|
+|---|---|---|
+|moto g31 Android12 arm64、USB|2.829s / 最終host25で2.305s PASS|dark、日本語キー入力・Space候補・tap/Enter確定済み|
+|F-52E Android16 arm64、USB|1.549s / 0.968s PASS|light、日本語候補表示・確定済み|
+|Pixel7 Android17 arm64、USB|1.490s / 0.985s PASS|Fcitx有効/default確認、GUIは画面ロック解除待ち|
+
+通常phaseはnihongo→日本語、kyouhagithubnipushshita→今日はgithubにpushしたの完全一致と非既定hashi候補のJSON保存を確認します。reloadは別processでSpace変換後の先頭候補とcommitへ学習が戻ることを確認します。ICU初期化・addonロード成功、.broken無しを確認。変換履歴のAOT読込はsource-generated serializerで修正済みです。
+
+APK build/checker、Python30件、bridge engine、core186件が成功。16KB ELF LOAD alignmentは確認済みですが、16KB page端末、API24下限、変換履歴以外のJSON用途、全focus/回転/記号/矢印は実機未確認。Mozc固有学習callbackは未対応。host lintは既存269件で失敗、変更ファイル0件と分離記録しています。coreのhead CI17件は未開始。Windows/macOS適合runnerはなく、Linux待機原因は未特定、実装3PRは依存順にmerge保留。
+
+APKは `/home/honya/Downloads/Meltype-Android-20261010/` に保管し、GitHub Release未公開。既存IMEを保持してhost25/plugin28を追加導入しました。
+
+以下の項目は過去のmainビルド検証と、残る受入条件です。各項目を全て実機合格したという意味ではありません。
 
 ## ビルド成果物の検証 (自動)
 
@@ -19,10 +37,10 @@
 - すべての `LOAD` セグメントの `p_align` が 16384 以上
 - 成果物の SHA256 が manifest の記録と一致し、元 core に build 出力が残っていない
 
-未確認 (script の検証でも実機でもまだ確かめていない):
+mainの旧NativeAOT単体成果物では未確認だった項目（Android完成ブランチの結果は上記）:
 
 - 実機 Android での ICU/globalization の解決
-- 設定・学習の JSON 保存
+- 設定・学習の JSON 保存（変換履歴のみ上記で確認）
 - APK への収録と端末での動作
 
 単体テスト (`tests/`) の内容と実行方法は [tests/README.md](../tests/README.md) を参照してください。
@@ -58,7 +76,7 @@
 
 ## hostキーボードの設計受入
 
-既存host UIを基準にした[要求](ARCHITECTURE.md#キーボードの要求と参照)の今後の試験です。Gboard/ATOKを参考にする新設計と、Meltypeを統合したAndroid host・APK・端末検証は未実施です。
+[R-03要求](REQUIREMENTS.md)と[基本設計](ARCHITECTURE.md)の受入項目です。moto dark/F-52E lightの日本語操作は上記で確認済み。次の全操作の網羅検証とPixel GUIは未完です。
 
 - QWERTY・数字行を維持しローマ字・英語・混在入力のラベルと入力結果を照合する。
 - 主画面`@`・句読点、記号面への到達と復帰、左右矢印を確認する。

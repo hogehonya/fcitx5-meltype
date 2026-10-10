@@ -1,18 +1,34 @@
 # Meltype Fcitx5 plugin (Linux / Android)
 
-Meltypeを Linux と Fcitx5 for Android のプラグインとして開発するリポジトリです。公開先は [hogehonya/fcitx5-meltype](https://github.com/hogehonya/fcitx5-meltype) です。Linux Fcitx5 addon と共通 ABI adapter があり、実 core と GUI で混在入力を検証しました。Android factory/bridge の統合、Gradleプロジェクト、APKはまだありません。固定coreからarm64 (arm64-v8a) のNativeAOT共有ライブラリを作るビルド入口と単体テストがあり、controller環境で実buildとELF検証を確認しています。端末検証は未実施です。
+Meltypeの日本語・英語混在入力をFcitx5へ接続するLinux / Androidプラグインです。ソースの開発正本は [Gitea fcitx5-meltype](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype)、GitHub公開先は [hogehonya/fcitx5-meltype](https://github.com/hogehonya/fcitx5-meltype) です。
 
-ユーザー確定事項は「Fcitx5プラグイン形式」「リポジトリ・ビルド文書の作成」と、Issue #6 のプラグイン実装です。[Issue #1](https://gitea.honya.dev/honya-dev-forks/meltype-android/issues/1)を要求の入口とし、固定coreからのNativeAOT成果物生成を[Issue #3](https://gitea.honya.dev/honya-dev-forks/meltype-android/issues/3)で扱います。NativeAOTとarm64を最初のMVPに使う構成は調査に基づくAgent提案です。
+## 3リポジトリの役割
 
-- [Linux Fcitx5 addon の build・試験・導入](addon/README.md)
-- [ビルド入口と工程 (実行記録つき)](docs/BUILD.md)
-- [構成・ABI・必要な実装](docs/ARCHITECTURE.md)
-- [実行済み検証とAndroidの受入条件](docs/TESTING.md)
-- [ビルドscriptの使い方](scripts/README.md) / [単体テスト](tests/README.md)
-- [文書一覧](docs/README.md) / [サイトマップ](SITEMAP.md)
+|リポジトリ|担当|ビルド・設計の入口|
+|---|---|---|
+|[meltype](https://gitea.honya.dev/honya-dev-forks/meltype)|共通C#変換・英日判定・学習、NativeAOT C ABI|[core開発手順](https://gitea.honya.dev/honya-dev-forks/meltype/src/branch/main/docs/DEVELOPMENT.md)|
+|[fcitx5-meltype](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype)|Fcitx addon、共通adapter、Android factory、in-process Mozc bridge、plugin APK|[文書一覧](docs/README.md)|
+|[fcitx5-android](https://gitea.honya.dev/honya-dev-forks/fcitx5-android)|Android IMEサービス、キーボード・候補UI、plugin module登録、host APK|[hostフォーク手順](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/src/branch/honya/mozc-trial/HONYA.md)|
 
-Android addonとbridgeの実装正本はこのリポジトリとします。共通C# coreは[Meltype fork](https://gitea.honya.dev/honya-dev-forks/meltype)、IMEサービスとキーボードUIは[Fcitx5 Android fork](https://gitea.honya.dev/honya-dev-forks/fcitx5-android)の担当です。host側の`plugin/meltype`登録・APK統合は今後の計画です。Linux IBusランチャーはAndroidの起動方法として使いません。
+3リポジトリを維持します。Linux addonは [addon/README.md](addon/README.md)、Androidは以下の検証済みブランチの手順を参照してください。Linux IBusランチャーはAndroidの起動方法に使いません。
 
-独立pluginの由来・公開方針とGboard/ATOK参考のキーボード要求は[構成の正本](docs/ARCHITECTURE.md)を参照してください。
+## AndroidのビルドとAPK入手
 
-上流MeltypeのGPL-3.0-or-laterと、Mozc/Fcitx等の第三者ライセンス・copyright・NOTICEを保持します。依存コードの導入時に原本を同梱し、独自の互換性判断やライセンス変更を行いません。
+2026-10-10時点でAndroid arm64-v8aのhost・plugin・instrumentation APKをビルドし、moto g31（Android 12）、F-52E（Android 16）、Pixel 7（Android 17）へ導入しました。3端末とも日本語・英日混在入力、学習保存と別process再読込のinstrumentationが成功しています。GUI入力・候補確定はmoto g31のdarkとF-52Eのlightで確認済みです。Pixel 7のGUI確認は画面ロック解除待ちです。
+
+実装はまだ既定ブランチへマージしていません。依存はcore `87b1ae13` → plugin `14cbeaa` → host `a0cf7ed8`です。core headのCI17件は未開始です。Windows/macOSに適合するrunnerはなく、Linux待機の原因は未特定です。このため、[core PR #8](https://gitea.honya.dev/honya-dev-forks/meltype/pulls/8)、[plugin PR #11](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/11)、[host PR #11](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/11)は依存順にマージ保留です。
+
+- [検証済みAndroid APKビルド手順](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/android/README.md): JDK 21、SDK 36、NDK 28.0.13004108、NativeAOT/Mozc入力とGradle引数。
+- [検証済み固定依存とNativeAOT生成](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/docs/BUILD.md)。既存dirty cloneを使わず独立checkoutでビルドします。
+- [実機結果・SHA256・制限](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/docs/TESTING.md)。16KB page端末と他のJSON保存用途は実機未確認です。
+
+APKは作業ホストの `/home/honya/Downloads/Meltype-Android-20261010/` に保管しています。host・pluginを組で導入し、テストAPKは検証時に使用します。**GitHub ReleaseでのAPK公開はまだ行っていません。** このローカルパスは外部からのダウンロードURLではありません。上流Fcitx5 AndroidのRelease APKにこのMeltype統合が含まれるとは扱いません。
+
+## 設計・検証
+
+- [要求定義](docs/REQUIREMENTS.md) / [要件定義と受入対応](docs/SPECIFICATIONS.md)
+- [基本設計・構成図・フロー](docs/ARCHITECTURE.md)
+- [このブランチのビルド入口](docs/BUILD.md) / [検証記録](docs/TESTING.md)
+- [ビルドscript](scripts/README.md) / [単体テスト](tests/README.md)
+
+上流MeltypeのGPL-3.0-or-laterとMozc/Fcitx等の第三者ライセンス・copyright・[NOTICE](NOTICE)を保持します。

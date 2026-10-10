@@ -1,7 +1,7 @@
 # Meltype Fcitx5 addon
 
-[Issue #6](https://gitea.honya.dev/honya-dev-forks/meltype-android/issues/6) の Linux 最小プラグインです。`engine.cpp`、`session.h`、`meltype_abi.h` は Android でも共有する入力・ABI 部分、`factory.cpp` は Linux の Mozc helper 初期化です。
-Android の in-process Mozc bridge は [Issue #5](https://gitea.honya.dev/honya-dev-forks/meltype-android/issues/5) で別に実装します。Android factory・host 登録・APK はまだありません。この CMake 入口は Android を受け付けず、未完成の APK 成功を装いません。
+[Issue #6](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/6) の Linux 最小プラグインです。`engine.cpp`、`session.h`、`meltype_abi.h` は Android でも共有する入力・ABI 部分、`factory.cpp` は Linux の Mozc helper 初期化です。
+Android の in-process Mozc bridge、factory、host登録、APKは[検証済み未mergeブランチ](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/android/README.md)に実装済みです。このmainにはまだ含まれません。この CMake 入口は Android を受け付けず、未完成の APK 成功を装いません。
 
 ## Linux build
 
@@ -55,10 +55,10 @@ helper は絶対パス必須、profile を指定する場合も絶対パスで�
 `commits[]` の編集、preedit、候補、候補選択、surrounding text を Fcitx UI へ反映します。Fcitx の Unicode cursor は UTF-8 の文字境界で切り、core の `deleteBefore` (UTF-16 単位) を UCS4 文字数へ変換します。サロゲート途中や取得済み文脈を超える削除は拒否します。選択範囲のある入力欄・password/sensitive 欄の文脈は渡しません。password/sensitive キーと非 BMP キーは host へそのまま通します。最初の対応keyでsessionを遅延作成します。reset / deactivate は未確定入力を確定しhandleを保持します。context property破棄でhandleを破棄します。非 BMP / 未対応キーを通す前にも未確定文字を確定し、入力順序を維持します。例外時は session を破棄して UI を消し、次の入力で新規作成します。
 入力メソッドの直接英数切り替えは Fcitx の Ctrl+Space で行います。隔離 GUI で `meltype` → `keyboard-us` → `meltype` の切り替えを確認しました。
 
-Linux では上流 `meltype_init_mozc` と既存 helper が変換・Mozc 学習を担当します。Android では共通 engine/session に [ARCHITECTURE](../docs/ARCHITECTURE.md) の callback bridge を接続し、process 実行は使いません。Android bridge の学習 callback、ABI/header 合流、packaging は未実装です。
+Linux では上流 `meltype_init_mozc` と既存 helper が変換・Mozc 学習を担当します。Android では共通 engine/session に [ARCHITECTURE](../docs/ARCHITECTURE.md) の callback bridge を接続し、process 実行は使いません。Android bridgeのMozc固有学習callbackは未対応です。ABI/header接続とpackagingは検証済みAndroidブランチにあります。
 
 ## 実行結果
 
-2026-10-10 に上記 Linux build、実 core integration test と異常回復 test (2/2) が成功しました。別 D-Bus / Xvfb の GTK 入力欄で addon をロードし、`kyouhagithubnipushshita` + Enter が `今日はgithubにpushした` になる実 GUI 確認も成功しました。通常デスクトップの入力設定はその検証では変更していません。Android クロス build・APK・端末試験は未実施です。
+2026-10-10 に上記 Linux build、実 core integration test と異常回復 test (2/2) が成功しました。別 D-Bus / Xvfb の GTK 入力欄で addon をロードし、`kyouhagithubnipushshita` + Enter が `今日はgithubにpushした` になる実 GUI 確認も成功しました。通常デスクトップの入力設定はその検証では変更していません。Androidクロスbuild・APK・端末試験は別ブランチで実施済みです。[実測](../docs/TESTING.md#2026-10-10のandroid受入結果)を参照してください。
 
 キー変換と JSON 表示契約は GPL-3.0-or-later の上流 Meltype `linux/ibus-engine-meltype` (Copyright 2026 Yukishiro) と core ABI に基づきます。NativeAOT / Mozc / Fcitx の既存ライセンスと NOTICE は配布元のものを保持してください。

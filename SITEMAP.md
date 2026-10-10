@@ -18,3 +18,6 @@
 - [addon/README.md](addon/README.md): Linux Fcitx5 addon と共通 ABI adapter の build・試験
 - [LICENSE](LICENSE): GPL 原本
 - [NOTICE](NOTICE): 上流由来と別配布依存の帰属
+
+- [要求定義](docs/REQUIREMENTS.md)
+- [要件定義](docs/SPECIFICATIONS.md)
