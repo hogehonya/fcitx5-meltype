@@ -1,6 +1,6 @@
 # 実装後の検証
 
-以下はAndroid実装後の受入条件です。現在はAPKがなく、どの条件もAndroid上で成功確認していません。Linuxでの動作をAndroidの合格証拠に流用しません。
+以下はAndroid実装の受入条件と実行記録です。Android 12 arm64実機で下記の項目が成功しました。他環境と未実施項目は区別し、Linuxの結果をAndroidの合格証拠に流用しません。
 
 ## ビルド成果物の検証 (自動)
 
@@ -19,11 +19,7 @@
 - すべての `LOAD` セグメントの `p_align` が 16384 以上
 - 成果物の SHA256 が manifest の記録と一致し、元 core に build 出力が残っていない
 
-未確認 (script の検証でも実機でもまだ確かめていない):
-
-- 実機 Android での ICU/globalization の解決
-- 設定・学習の JSON 保存
-- APK への収録と端末での動作
+Android 12でaddonロード、ICU初期化、日本語変換、変換学習JSONの保存・再読込を確認しました。他の設定・学習JSON用途と他APIの実機確認は未実施です。
 
 単体テスト (`tests/`) の内容と実行方法は [tests/README.md](../tests/README.md) を参照してください。
 
@@ -31,7 +27,7 @@
 
 - 固定core/host/submodule SHA、.NET SDK/runtime pack、JDK、NDK、SDK、ABIを記録し、新しいcloneから再現する。
 - NativeAOT `.so`のarm64 ABI、C exports、SONAME/NEEDED、16KB ELF alignmentを確認する。APK packagingのalignmentも調べ、4KB/16KB環境で起動する。[Android 16KB検証](https://developer.android.com/guide/practices/page-sizes)
-- host minSDK 23と採用NativeAOTのminimum APIを照合し、対応下限の端末でもdlopen・初期化が成功する。
+- host minSDK 23、plugin minSDK 24と採用NativeAOTのminimum APIを照合し、対応下限の端末でもdlopen・初期化が成功する。
 - ICU/globalizationと必要ならcrypto/libsslを含め、依存不足・辞書不足時はエラーを示し、IMEサービスを落とさない。
 - plugin APK導入後にMeltypeがFcitx入力方式一覧へ現れ、既存Mozc等と切り替えられる。
 
@@ -60,7 +56,7 @@
 
 ## hostキーボードの設計受入
 
-既存host UIを基準にした[要求](ARCHITECTURE.md#キーボードの要求と参照)の今後の試験です。Gboard/ATOKを参考にする新設計と、Meltypeを統合したAndroid host・APKを生成済みです。端末検証は実行中で、結果を[Android手順](../android/README.md)へ記録します。
+既存host UIを基準にした[要求](ARCHITECTURE.md#キーボードの要求と参照)の今後の試験です。Gboard/ATOKを参考にする新設計と、Meltypeを統合したAndroid host・APKを生成済みです。下記に実機で確認した結果を記録します。buildと実行手順は[Android手順](../android/README.md)を参照してください。
 
 - QWERTY・数字行を維持しローマ字・英語・混在入力のラベルと入力結果を照合する。
 - 主画面`@`・句読点、記号面への到達と復帰、左右矢印を確認する。
@@ -68,3 +64,34 @@
 - IME切替と配列/記号面切替のラベル・操作・結果を区別し既存入力を維持する。
 - light/dark双方でキー境界・文字・候補・選択状態が読める。日本語デザイン成果物の実装はIBM Plex Sans JPを使用する。
 - 実機画面と操作で採否を記録する。12キー/フリックは別途採用決定が必要。
+
+## Android実機の実行記録（2026-10-10、Issues #5/#8）
+
+依頼: ユーザーのAndroid plugin完成・接続端末追加、およびGboard/ATOK参考キーボード要求（plugin Issue #8、host Issues #9/#10）。端末はmoto g31 `ZY22FBW7BR`、Android 12、arm64-v8a。既存ATOKを保持しdebug hostとpluginを追加しました。
+
+検証した成果物:
+
+|用途|APK version|SHA256|
+|---|---|---|
+|host|`0.1.3-22-g137c919b` arm64 debug|`622b7f7f74d5a353ef53aaa4a10d05d2c9b640c3086a79299e5e7077f4a55bb9`|
+|instrumentation|`0.1.3-25-gab2f5117` debug AndroidTest|`b22e0aebdc8936f23a380e2bdfa7253d5a1e3a6c5f4f7050f3662976f19d6eae`|
+|plugin|`0.1.3-28-g65922d39` arm64 debug|`be496fe31cfc059209e05abe8950359204a9c7ad4d3cd46a00ba8379a8314995`|
+
+plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`。APK内NativeAOT provider SHA256は `200b5150bc97afa7c01f5d28825fa430bda18d19539de9c66990a13101725339` でbuild manifestと一致。テストAPKはbuild metadataのcommit後に追加したreload仕様修正（host `9821b319`）を含みます。host product codeは同じで、その後のgitlink・文書更新による再buildは不要です。
+
+- `Loaded addon meltype`を実機logcatで確認。初回のSONAME欠落は正式publishのLinkerArgで修正済み。
+- `MeltypeTest`通常実行 PASS（2.829秒）: `nihongo`→候補選択→`日本語`、`kyouhagithubnipushshita`→`今日はgithubにpushした`の完全一致、非既定漢字候補のJSON保存。
+- 別processの `-e phase reload` PASS（2.215秒）: 保存した読みをSpaceで変換した際の先頭候補と、候補を選び直さずReturnで確定した文字列が保存した学習結果と一致。
+- 保存先はnative正本 `DataManager.dataDir/files/meltype`（この端末ではdevice-protected storage）。ConversionHistoryのNativeAOT reflection読込失敗はsource-generated metadataで修正。既存JSON形式、不正JSON、保存後の別instance読込、Forgetをcoreテストで確認し全186/186 PASS。
+- GUIでMeltypeを選択し、ソフトキー7tapで `nihongo`→`日本語` preedit、Spaceで `日本語/ニホンゴ/にほんご/Japanese`候補表示、先頭候補tap＋Enterで`日本語`確定。dark Pixelのキー境界、数字行、左右矢印、IBM Plex Sans JP表示を確認。
+- GUI証拠は実施環境の `/tmp/meltype-touch-nihongo.png`、`/tmp/meltype-candidates-ready.png`、`/tmp/meltype-touch-commit.png`。リポジトリへの画像収録はしていません。
+- 正規NativeAOT/Gradle build成功、Python30/30 tests成功、APK checkerでarm64・SONAME・symbol version provider・DT_NEEDED・RUNPATH・ELF 16KB alignment・assetsを検証。plugin lintDebug成功（警告5件）。
+
+未実施・制限:
+
+- Android 12以外、plugin最低API 24、16KB page size端末は実機未確認。ELF 16KB alignmentの静的検査成功を16KB実機起動成功とは扱いません。
+- Settings、UserModel、LanguageMemory、TranslationHistory等、変換履歴以外のJSON用途の実機保存・再読込は未確認。既存IL2026/IL3050警告を抑制していません。
+- Mozc固有learning callbackは未公開で未対応。確認した保存・復元はMeltype側の変換学習です。
+- hardware keyboard、lightテーマの実機視認性、端末rotation、password欄、容量不足等の全受入条件は今回の実機検証に含みません。
+- host lintDebugは既存269件（UseAppTint 1、StringFormatMatches 2、MissingTranslation 266）で失敗。今回変更したファイルにあるerrorは0件で、baselineやgate無効化はしていません。
+- Linux-x64 NativeAOT smokeはruntime pack未取得・repository NuGet sources設定によるNU1100で未完了。Android NativeAOTビルドと上記実機reloadで修正を検証しました。
