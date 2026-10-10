@@ -31,3 +31,7 @@ Android実装は検証済みブランチにあり、mainへ未merge。2026-10-10
 ## 英字モードの追加要求（Issue #20）
 
 2026-10-10本会話でユーザーが「meltype自体に無変換もできるといいな英字モード」と要求。Meltype選択中の直接英字入力を追加する。無変換で開始し変換/ひらがなで通常へ復帰する操作は親Agentの採用案であり、キー割当までユーザー指定とは扱わない。[Issue #20](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/20)で実装・受入を追跡する。
+
+## Android英字モード反映（Issue #22）
+
+2026-10-10本会話でユーザーがLinux英字mode完成後「反映させて」とAndroidへの反映・実機更新を要求。Linux PR21の共有engineを取り込み、画面用のMeltype専用ABC/かな操作と物理無変換/変換mappingを接続する（画面操作はAgent採用案）。既存LanguageKey/数字記号面ABC layout切替は維持。公開試用版assetは変更せず、今回buildしたAPKをUSB指定端末へ更新して別に検証する。

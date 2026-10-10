@@ -57,3 +57,9 @@ adb -s SERIAL shell am instrument -w -e phase reload \
 今回統合した source snapshot は `snapshot-provenance.json` に元worktreeとSHA256を記録しています。元worktreeには書き込みません。生成されたビルドfileをsource snapshotには含めません。
 
 実機ロードでproviderのSONAME欠落によりBionicのsymbol version lookupが失敗することを確認したため、NativeAOTの隔離publish入力にSONAME linker argを追加しました。APK checkerにもprovider SONAMEとVERNEED/DT_NEEDED整合検査を追加しています。既存provider成果物は変更せず、正式build scriptで再生成します。
+
+## 英字モード（Issue #22）
+
+共有engineはLinux PR21と同じ入力context単位の直接英字状態を使用します。物理無変換で直接英字、変換/ひらがなで通常の英日自動判定へ復帰。対応hostはMeltype選択時だけ画面にABC/かなキーを表示し、同じnative key経路へ送ります。既存のLanguageKeyと数字/記号面ABCはそれぞれIME切替・layout復帰を維持します。英字表示はA、通常はあ。
+
+追加instrumentationは上記am instrumentに `-e phase english` を付けます。Virtual key経路でnihongo+Spaceを直接アプリ向けkeyとして返し、Meltype選択を維持、復帰後日本語commitを完全一致確認します。通常/reload phaseも回帰として再実行します。物理mappingと専用画面キー表示/タップは別に確認し、実行前に成功とは記録しません。core固定87b1、既存debug署名を維持し、Release alpha.1の既公開APKは変更しません。
