@@ -137,3 +137,9 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 ## Linux 英字直接入力の検証（Issue #20）
 
 2026-10-10、Linux配布v1.0.0 provider/helper、Fcitx5 5.1.12、G++14.2.0を同じ固定入力として使用。新受入testを旧engineへ適用すると `Muhenkan consumed` でintegration失敗（Red）、実装後はctest 2/2成功。直接キーpass-through、通常Meltype復帰、context独立、pending/候補の一回commit、release/修飾キー保持、mode表示/解除後保持を検証した。`addon/README.md`のcmake/ctest手順を利用し、HOME/Mozc profileは `/home/honya/tmp/fcitx5-english-mode/green-home` に隔離した。GUI検証は別途Issue #20へ記録し、ここで実行済みとは扱わない。既存Android APK・対応ソースassetは変更しない。
+
+## Android未確定文字列のかな変換（Issue #24）
+
+要求出所は2026-10-10のユーザー発言「漢字かな混じりではなくカナだけ、かなだけに変換できるようにしたい」。画面の直接英字切替キーを「かな」「カナ」に置き換え、core既存F6/F7による未確定文字列全体の読み変換を使用する。物理無変換の直接英字機能は維持する。永続かな入力モード・12key配列・英単語の日本語発音への翻訳は対象外。
+
+実core integrationは`nihongo`のlive入力/候補表示中それぞれからF6→`にほんご`、F7→`ニホンゴ`、候補消去、Enter完全一致、次入力の通常`日本語`復帰を確認する。Android instrumentation `MeltypeTest -e phase script`は画面と同じaction helperを使用し、上記に加えて直接英字から通常復帰・空のF6/F7非転送を確認する。実機結果はIssue #24へ記録する。engine/core変更なしでplugin39 APKを再利用、host/testのみ生成する。
