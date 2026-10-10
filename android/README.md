@@ -48,7 +48,7 @@ adb -s SERIAL shell am instrument -w -e phase reload \
   org.fcitx.fcitx5.android.debug.test/androidx.test.runner.AndroidJUnitRunner
 ```
 
-テストは Fcitx の同じnative経路で `nihongo` →候補選択→ `日本語` commit と、`kyouhagithubnipushshita` → Return → `今日はgithubにpushした` の完全一致を確認します。また、`hashi` の非既定漢字候補を選び、JSONに保存した値を確認します。`phase reload` は別process起動で同じ読みのlive preeditとcommitが学習した候補へ戻ることを確認します。実機でbackspace、端末rotation、ICU初期化を別途確認します。端末未実施の検証をAPKビルド成功だけで成功扱いしません。Mozc固有学習はcallback ABIに公開されていないため未対応です。
+テストは Fcitx の同じnative経路で `nihongo` →候補選択→ `日本語` commit と、`kyouhagithubnipushshita` → Return → `今日はgithubにpushした` の完全一致を確認します。また、`hashi` の非既定漢字候補を選び、JSONに保存した値を確認します。`phase reload` は別process起動で同じ読みをSpaceで変換した際の先頭候補とcommitが学習した候補へ戻ることを確認します。実機でbackspace、端末rotation、ICU初期化を別途確認します。端末未実施の検証をAPKビルド成功だけで成功扱いしません。Mozc固有学習はcallback ABIに公開されていないため未対応です。
 
 2026-10-10 の統合ビルドで host、plugin、instrumentation APK の生成が成功しました。plugin checker は arm64-only、NativeAOT/addon収録、Fcitx/STL重複無し、ELF 16KB LOAD alignment、正規asset/config descriptor、DT_NEEDED basename、`RUNPATH=$ORIGIN` が成功しています。Python単体30件と既存bridge実engine試験も成功しています。端末の検証結果は実行後に追記します。
 
