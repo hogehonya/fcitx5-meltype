@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin>
+    <apiVersion>0.1</apiVersion>
+    <domain>fcitx5-meltype</domain>
+    <description>@string/description</description>
+</plugin>

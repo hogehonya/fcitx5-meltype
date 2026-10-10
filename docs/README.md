@@ -9,3 +9,5 @@
 - [scripts/README.md](../scripts/README.md): ビルドscriptの引数・出力・検証内容
 - [tests/README.md](../tests/README.md): ビルド入口の単体テスト
 - [入口](../README.md) / [全ファイル](../SITEMAP.md)
+
+- [in-process Mozc bridge](../native/README.md): native APIとビルド契約

@@ -30,3 +30,5 @@ contextごとにsession handleを持ち、破棄・focus離脱・resetで未確�
 最初のarm64対応はAgent提案です。armeabi-v7a/x86はBionic NativeAOTの対応RIDに含まれないため、hostの全ABIを自動で継承しません。[NativeAOT v10.0.0](https://github.com/dotnet/runtime/blob/v10.0.0/src/coreclr/nativeaot/docs/android-bionic.md)
 
 [ビルド](BUILD.md) / [検証](TESTING.md) / [文書一覧](README.md)
+
+[In-process Mozc bridge・native buildと契約](../native/README.md)（Issue #5）。APK/端末統合は別工程です。

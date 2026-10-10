@@ -1,3 +1,6 @@
 # Python (scripts/build-core.py と tests を動かしたときに出るもの)
 __pycache__/
 *.pyc
+android/plugin/build/
+android/plugin/.cxx/
+android/plugin/src/main/assets/

@@ -5,10 +5,13 @@ The key mapping and NativeAOT ABI/JSON adapter derive from Meltype:
 Copyright (C) 2026 Yukishiro (@yksr_melt / @yksr-melt).
 Upstream: https://github.com/yksr-melt/Meltype
 Source references: linux/ibus-engine-meltype, src/Meltype.Mac.Native/Exports.cs,
-src/Meltype.Core/Composition/MeltypeSession.cs.
+src/Meltype.Core/Composition/MeltypeSession.cs,
+native/mozc/meltype_mozc_helper.cc (in-process bridge adaptation).
 The addon and tests were added in 2026 for this fork.
 
-No Fcitx, Mozc or NativeAOT binary/source dependency is bundled by this addon.
+The source repository does not vendor Fcitx, Mozc or NativeAOT binaries.
+Android APK packaging includes the explicitly supplied NativeAOT provider and
+links a static Mozc bridge; retain THIRD-PARTY-NOTICES.md with the APK assets.
 Fcitx is linked through its public API; the provider library and Mozc helper
 are supplied separately. Preserve their original licenses and third-party
 notices when distributing a combined package. Meltype's third-party notices

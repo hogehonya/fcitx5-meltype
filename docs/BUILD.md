@@ -2,7 +2,7 @@
 
 このrepoのビルド入口は `scripts/build-core.py` です。固定coreから `arm64-v8a` の NativeAOT 共有
 ライブラリを作り、`manifest.json` と検証結果を残します。Linux Fcitx5 addon は [addon/README.md](../addon/README.md) の独立 CMake 入口で build できます。
-Android Gradle task、factory/bridge 統合、APK はまだありません。Android addon/APK の工程は後半に書きます。
+Android factory/bridge と Gradle module は実装済みです。[Android APK手順](../android/README.md)でhost forkへ登録してビルドします。
 
 controller環境で共有ライブラリの生成、必須export、16KB LOAD alignmentを検証しています。
 worker sandboxのAF_UNIX制限による失敗は[実行記録](#実行記録)で分離しています。
@@ -143,16 +143,8 @@ APK packaging 側の alignment は別途確認します。[16KB公式手順](htt
 再現可能なbuild定義へ取り込みます。現時点のcloneコマンドだけでMozc buildが成功するという保証は
 ありません。
 
-## 今後追加するAPK工程
+## Android APK工程
 
-1. このrepoへaddon・bridge・ABI headerを実装し、coreへ保存先等の必要変更を加える。
-2. host forkへ固定revision参照の`plugin/meltype`を登録する。既存Mozc pluginのPrefab依存・
-   addon/assets収録方法を参考にする。
-3. CMake imported shared targetでNativeAOTライブラリへリンクし、Mozc静的engine・辞書生成を
-   組み込む。hostと一致するSTLを使用し、Fcitx/libc++を重複収録しない。
-4. arm64を初期MVPとする提案を採用する場合、hostの`buildABI`をarm64-v8aへ制限する。module追加後に
-   `tasks`で実在taskを確認してからAPKコマンドを文書へ追加する。現在`plugin:meltype`taskは存在しない。
-5. APK内にaddon、NativeAOT `.so`、inputmethod/addon設定、辞書、必要な依存とライセンスを収録し、
-   [TESTING](TESTING.md)で端末検証する。
+現在のビルド入口、必要な固定入力、host登録、SDK/ABI、成果物検査は[Android手順](../android/README.md)を正本とします。root CMake は in-process Mozc bridge、`android/plugin` は Android addon/APK、`addon/CMakeLists.txt` は Linux addonです。
 
 [構成](ARCHITECTURE.md) / [検証](TESTING.md) / [文書一覧](README.md)

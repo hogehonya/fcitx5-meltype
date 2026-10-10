@@ -55,3 +55,5 @@
 ## Linux addon の実行済み検証
 
 [addon/README.md](../addon/README.md) の実 NativeAOT / Fcitx InputContext integration test と、隔離 D-Bus / Xvfb の GTK 混在文入力が成功しました。Android APK と端末試験の成功を意味しません。
+
+[In-process Mozc bridge・native buildと契約](../native/README.md)（Issue #5）。APK/端末統合は別工程です。

@@ -4,6 +4,9 @@
 #include <memory>
 #include <stdexcept>
 #include <nlohmann/json.hpp>
+#ifdef __ANDROID__
+static_assert(NLOHMANN_JSON_VERSION_MAJOR == 3 && NLOHMANN_JSON_VERSION_MINOR == 11 && NLOHMANN_JSON_VERSION_PATCH == 3, "Android build pins nlohmann-json 3.11.3");
+#endif
 namespace meltype {
 inline nlohmann::json result(char *raw) {
     std::unique_ptr<char, decltype(&meltype_free)> owned(raw, meltype_free);
