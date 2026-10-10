@@ -1,63 +1,157 @@
-# 構成と実装計画
+# 基本設計
 
-Fcitx5の入力・候補UIを使い、Meltypeの判定・ローマ字・混在入力・学習設定を共通C# coreから再利用する提案です。依存revisionは[BUILD](BUILD.md)を正本とします。
+Fcitx5の入力・候補UI、Meltypeの混在入力判定・ローマ字・学習、Mozcの日本語変換を組み合わせる。[要求定義](REQUIREMENTS.md)のR-01〜05と[要件定義](SPECIFICATIONS.md)のS-01〜08・NF-01〜04に対応する。依存revisionと再現手順は[BUILD](BUILD.md)、合否と実行記録は[TESTING](TESTING.md)を正本とする。
 
-## 実装の配置
+## 実装と公開の状態
 
-既存C++ addon・ABI adapterにAndroid Mozc bridge・factory・パッケージ統合用定義を追加する計画です。共通coreの必要変更はMeltype forkへ還元し、Fcitx5 Android forkにはこのrepoの固定revisionを参照する`plugin/meltype`とmodule登録を追加します。Linux addon と共通 ABI adapter は [addon](../addon/README.md) に実装しました。Android bridge、host module 登録、APK 統合はまだ存在しません。
+2026-10-10時点の実装根拠はplugin `14cbeaa`、host `a0cf7ed8`、core `87b1ae1` の各実装ブランチである。この設計文書のmain反映とAndroid実装のmain反映・公開は別工程であり、Android実装はまだmainへ統合されていない。以下は実装ブランチの動作を記述する。
 
-Linuxはaddon load時にfactory.cppが `meltype_init_mozc` を呼びます。キー処理は `Fcitx context → engine/session → NativeAOT → 外部Mozc helper process` です。Androidは起動時にfactoryが `meltype_set_data_directory` と `meltype_init(callback)` を呼ぶ計画で、キー処理は `Fcitx context → 共通adapter → NativeAOT → in-process C++ Mozc bridge` です。AndroidではAPKに収録した共有ライブラリを使います。Android 10以降の対象アプリは書込み可能なapp home内のファイルをexecveできません。[Android公式制限](https://developer.android.com/about/versions/10/behavior-changes-10#execute-permission)
+moto g31とF-52EでGUI入力の成功を確認した。PixelのGUI入力は未確認。core CIはheadの17件が未開始である。Windows/macOSには適合runnerがなく、Linuxの待機原因は未特定で、成功を確認できていない。ビルド、instrumentation、GUI、CI、公開の合否を相互に代用しない。端末・試験別の証拠と未確認範囲は[TESTING](TESTING.md)に集約する。
 
-## 再利用するコード
+## 3リポジトリの責務（S-01・S-08）
 
-Meltypeの`src/Meltype.Mac.Native/Exports.cs`にはcallback登録`meltype_init`、session作成/破棄、キー処理、確定、候補選択、direct切替、JSON結果解放が既存です。共通coreのexportですが、Linux providerは別の初期化経路を使います。
+|正本|所有する実装|他repoとの境界|
+|---|---|---|
+|[fcitx5-meltype](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype)|C++ addon、ABI/JSON adapter、Android factory、Mozc bridge、plugin APK定義、依存lock・検証script|coreの公開C ABIを呼ぶ。hostへ入力方式と候補eventを提供する|
+|[fcitx5-android](https://gitea.honya.dev/honya-dev-forks/fcitx5-android)|IMEサービス、キーボード・候補UI、plugin発見・ロード、保存先供給、Gradle module登録|pluginは固定gitlinkで参照する。レイアウトやthemeをaddonへ持ち込まない|
+|[Meltype](https://gitea.honya.dev/honya-dev-forks/meltype)|共通C# core、混在入力、ローマ字、session、学習・設定、NativeAOT exports|FcitxのUIやAndroid APK packagingを共通coreへ持ち込まない|
 
-`native/mozc/meltype_mozc_helper.cc`のHelperの変換・候補・学習処理をC++ bridgeへ抽出します。mainと標準入出力protocol、C#のProcess.Start経路は使いません。Fcitx AndroidのMozcには`mozc_direct_client.cc`によるin-process Engine/SessionHandlerと`mozc-static`リンクの実例があります。ただし既存Mozc addonの内部classは公開APIではなく、その共有状態を直接呼ぶ前提にしません。独立bridgeのengine初期化・辞書生成を固定ソースから組み込みます。現時点でP/Invoke追加は不要で、既存callbackを優先します。
+```mermaid
+%%{init: {"themeVariables": {"fontFamily": "IBM Plex Sans JP"}}}%%
+flowchart LR
+    subgraph Host[fcitx5-android / host IME process]
+        UI[キーボード・候補UI]
+        F[Fcitx InputContext]
+        UI <--> F
+    end
+    subgraph Plugin[fcitx5-meltype / plugin APK]
+        A[C++ addon / ABI adapter]
+        B[in-process Mozc bridge]
+        M[Mozc Engine / OSS辞書]
+        A --> B
+        B --> M
+    end
+    subgraph Core[Meltype / 共通core]
+        C[C# NativeAOT / libMeltypeNative.so]
+    end
+    F <--> A
+    A <--> C
+    C -->|変換callback| B
+    C --> D[host私有領域 / 設定・学習JSON]
+    F -->|保存先を供給| D
+```
 
-## ABI契約と追加作業
+図の枠はsource/APKの所有を示す。pluginのaddon、Mozc bridge、NativeAOTはhost IME processにロードされ、別serviceや外部helper processを起動しない。Linux providerは既存の外部Mozc helper経路を使う。
 
-既存ABIはUTF-8 NUL終端です。Meltypeが返すJSON文字列は`meltype_free`で解放します。callbackが返す文字列はC++側でmallocし、C#側がfreeします。NULLは変換失敗、候補は改行区切り、文節は`読み\t結果`の改行区切りです。helperのUS/RS形式とは異なるためbridgeが整形します。
+## 起動・保存先（S-02・S-05）
 
-adapterはcontextの最初の対応keyでsessionを遅延作成します。reset/deactivateはcommitしhandleを保持します。context property破棄でdestroyし、エラー時はdestroyして次の対応keyで再作成します。一般のfocus動作は検証済みとは扱いません。Fcitxキーを既存Windows VKとmodifier bitへ変換し、surrounding textをbefore/afterへ渡します。候補tapは`meltype_select_candidate`へ戻し、JSONのcommit/preedit/candidatesをFcitx UIへ反映します。core exportは排他しない設計なのでFcitx event threadへ直列化します。C++/managed例外をC ABIやhostへ漏らさない契約です。
+hostはAPI 24以上でdevice-protected storageの私有領域の絶対パスを`MELTYPE_DATA_DIR`へ供給する。Android factoryは保存先を検査し、`meltype_set_data_directory`、`meltype_mozc_bridge_init`、`meltype_init`の順に初期化してEngineを作成する。Mozc profileはその保存先の`mozc/`に置く。設定・学習はplugin APK自身の領域ではなくhostが書ける領域へ保存する。
 
-必要変更は次のとおりです。
+`meltype_init`は文節変換・候補callbackを登録する。isWord callbackは`nullptr`であり、専用のAndroid英語辞書providerを実装したことにはならない。bridgeはprocess内で同じprofileへの再初期化を許容し、異なるprofileへの再初期化は失敗する。初期化失敗時はfactoryがエラーを返し、入力内容や保存先をログへ出さない。
 
-- 保存先は固定coreに既存の`meltype_set_data_directory` (UTF-8の絶対パス、最初のSessionや設定・学習の読み込みより前に1回) をhostから呼ぶ。coreへのAPI追加は不要。SpecialFolder.LocalApplicationDataがAndroidで期待するパスになると仮定しない。plugin APK自身ではなくhost IME processが書ける領域を使う。
-- 既存callbackにはMozc Learnがない。学習をMVPへ含めるならlearn/save callbackを追加し、確定した文節と文脈を伝える。省く場合はMozc学習未対応と明記し、Meltype自身の学習との違いを示す。
-- isWord callback/wordProviderのAndroid実装と辞書供給を決める。NULLならその経路を使わない既存挙動を検証し、英語判定が完成済みとは扱わない。
-- C++ callbackの例外を内部で捕捉しNULL等で失敗を返す。handle不正・二重破棄・初期化失敗でIME全体を落とさない。
+Meltype側の学習JSONと再読込を実装した。Mozc固有のlearn/save callbackは現行ABIにないため未対応であり、両者を区別する。再起動後の学習確認手順は[Android受入](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaabef946c160ecc67004a9b49b4a0a39218/android/README.md#実機受入)と[TESTING](TESTING.md)を参照する。
 
-最初のarm64対応はAgent提案です。armeabi-v7a/x86はBionic NativeAOTの対応RIDに含まれないため、hostの全ABIを自動で継承しません。[NativeAOT v10.0.0](https://github.com/dotnet/runtime/blob/v10.0.0/src/coreclr/nativeaot/docs/android-bionic.md)
+実装根拠: pluginの`addon/android_factory.cpp`・`native/mozc_bridge.cc`、coreの`src/Meltype.Mac.Native/Exports.cs`。これらのAndroidファイルは実装ブランチに存在し、文書mainだけでは参照できない場合がある。
+
+## 入力・変換・候補・確定（S-03・S-04）
+
+addonはFcitx keyをWindows VK・UTF-16文字・modifier bitへ変換する。最初の対応keyでInputContextごとのsessionを遅延作成し、coreへ渡す。未確定文字がないときだけ取得可能なsurrounding textをbefore/afterへ渡す。password/sensitive欄はcoreへ渡さず、通常の入力経路へ返す。
+
+coreのJSON結果から`commits`の削除と文字列確定、`view`のpreedit・hint・候補を反映する。候補リストは`converting=true`かつ候補が複数のときに表示し、候補indexをcoreへ戻す。JSONの`consumed`がtrueの場合だけkey eventを受理する。
+
+```mermaid
+%%{init: {"themeVariables": {"fontFamily": "IBM Plex Sans JP"}}}%%
+sequenceDiagram
+    participant U as 利用者
+    participant H as host UI / Fcitx
+    participant A as addon / Session
+    participant C as NativeAOT core
+    participant B as Mozc bridge
+    U->>H: 英字入力 / Space
+    H->>A: keyEvent・取得可能な周辺文字
+    A->>C: meltype_handle_key
+    opt 日本語変換が必要
+        C->>B: 文節・候補callback
+        B-->>C: UTF-8変換結果
+    end
+    C-->>A: JSON commits / view / consumed
+    A->>H: preedit・候補表示 / 必要ならcommit
+    U->>H: 候補tap
+    H->>A: Candidate.select(index)
+    A->>C: meltype_select_candidate
+    C-->>A: 更新JSON
+    A->>H: 選択結果・確定を反映
+    U->>H: Enter等で確定
+    H->>A: keyEvent
+    A->>C: meltype_handle_key
+    C-->>A: commit結果
+    A->>H: commitString・preedit更新
+```
+
+候補tapが確定するか選択状態を更新するかはcoreの返すJSONに従う。図は代表操作の連携を示し、すべてのkeyを固定した状態遷移仕様に置き換えない。
+
+```mermaid
+%%{init: {"themeVariables": {"fontFamily": "IBM Plex Sans JP"}}}%%
+stateDiagram-v2
+    [*] --> NoSession
+    NoSession --> Editing: 最初の対応keyでsession作成
+    Editing --> Editing: 文字入力・Backspace / preedit更新
+    Editing --> Converting: Space等 / convertingなview
+    Converting --> Converting: 候補移動・選択 / view更新
+    Converting --> Editing: coreが編集viewを返す
+    Editing --> Idle: commit / preeditなし
+    Converting --> Idle: commit / preeditなし
+    Idle --> Editing: 次の文字入力
+    Editing --> Idle: reset・deactivate / commit
+    Converting --> Idle: reset・deactivate / commit
+    Idle --> NoSession: context破棄
+    Editing --> NoSession: context破棄・処理エラー
+    Converting --> NoSession: context破棄・処理エラー
+```
+
+ここでEditing/Converting/Idleは表示上の状態で、addonが保持する独立enumではない。reset/deactivateはcommitしてsessionを保持し、context property破棄はsessionをdestroyする。エラー時はsessionを破棄してUIをクリアし、次の対応keyで再作成する。
+
+実装根拠: pluginの`addon/engine.cpp`・`addon/session.h`。非BMPや未対応keyは入力順序を保つため既存preeditをcommitしてから通常経路へ返す。削除位置はUTF-16単位からUnicode文字数へ変換し、surrogate pair分割や範囲超過を拒否する。
+
+## ABIと安全境界（NF-01・NF-02）
+
+文字列はUTF-8 NUL終端。coreが返すJSONはadapterが`meltype_free`で解放する。callbackの文字列はC++側がmallocし、C#側がfreeする。変換失敗はNULL、候補は改行区切り、文節は`読み\t結果`の改行区切りで渡す。Linux helperのUS/RS protocolをAndroid callbackへそのまま流さない。
+
+core exportは排他を提供しないため、呼出しはFcitx event threadで直列化する。callback・bridgeはsessionより長いprocess寿命を持つ。C++/managed例外は各ABI境界で失敗値へ変換し、hostへ漏らさない。addonは結果の削除範囲をすべて検証してからアプリの文字列を編集する。
+
+開発・ビルドは分離checkout/worktreeを使う。Mozc sourceはstagingへコピーしてAndroid用変更を適用し、元repo・dirty submodule・既存成果物を上書きしない。
+
+## ビルドと配布（S-07・NF-03・NF-04）
+
+Android pluginの対象はarm64-v8a / API 24以上。hostの全ABIへ自動展開しない。NativeAOTとaddonを同じplugin APKへ収録し、addonは`RUNPATH=$ORIGIN`からproviderを解決する。Fcitx共有ライブラリとSTLはhostが所有し、pluginへ重複収録しない。SDK/NDK等の値やコマンドは[BUILD](BUILD.md)・[Androidビルド](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaabef946c160ecc67004a9b49b4a0a39218/android/README.md#ビルド)を正本とする。
+
+```mermaid
+%%{init: {"themeVariables": {"fontFamily": "IBM Plex Sans JP"}}}%%
+flowchart TD
+    L[固定revision / 依存lock] --> C[core NativeAOT生成]
+    L --> M[Mozc clean source・OSS辞書・host protoc準備]
+    C --> E[ELF exports・SONAME・ABI・alignment検査]
+    M --> P[host Gradleでplugin addon・APK生成]
+    E --> P
+    L --> H[固定host / UI・IME APK生成]
+    P --> V[plugin APK構成・依存・alignment検査]
+    H --> T[host・plugin・test APKを実機導入]
+    V --> T
+    T --> I[instrumentation / 入力・学習再読込]
+    I --> G[GUI / 候補tap・配列・明暗・切替]
+    G --> R[PR・CIと受入証拠の確認]
+    R --> S[main統合・固定参照更新]
+    S --> D[公開用成果物・配布記録]
+```
+
+後半は完了までの工程で、すべての段階が現在成功済みという図ではない。ELFの16KB LOAD alignmentやAPK構成検査の成功は、16KBページサイズ端末での起動成功を意味しない。min API実機・未確認端末・CIの状況は[TESTING](TESTING.md)を参照する。
+
+pluginはGPL-3.0-or-laterとしてMeltype由来のCopyright 2026 Yukishiroと[NOTICE](../NOTICE)、第三者ライセンス原本を保持する。依存更新・公開境界は[BUILD](BUILD.md#依存更新と公開)を参照する。
+
+## キーボードの設計（S-06）
+
+ユーザー要求の出所は[plugin #10](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/10)、実装範囲は[host #9](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/issues/9)。ATOK参考のQWERTY・数字行・主画面`@`と句読点・記号面・左右カーソルを維持し、Gboard参考のキー背景分離・余白・角丸を採用した。キー文字にはIBM Plex Sans JPを同梱する。候補欄はFcitxの既存UIとPixel配色を使う。
+
+寸法・設定・既存設定保持はhostの`HONYA.md`、`ThemePrefs.kt`、`KeyView.kt`が正本。キーボードのタッチ領域は維持し、外観のinsetだけを調整する。12キー/フリックの採用は未決定であり、今回のQWERTY実装に含めない。[受入](TESTING.md#hostキーボードの設計受入)で入力結果・候補tap・明暗を確認する。
 
 [ビルド](BUILD.md) / [検証](TESTING.md) / [文書一覧](README.md)
-
-[In-process Mozc bridge・native buildと契約](../native/README.md)（Issue #5）。APK/端末統合は別工程です。
-
-## ABI profileと初期化
-
-検証済みLinux配布providerと、Android向け固定coreの初期化経路を比較します。
-
-|profile|入力|初期化と状態|
-|---|---|---|
-|Linux|配布v1.0.0 ([addon](../addon/README.md))|`meltype_init_mozc`使用。保存先APIは配布版にないため呼ばない。addon/GUI検証済み|
-|Android|[BUILD](BUILD.md)の固定core|既存export `meltype_set_data_directory` と `meltype_init` callbackをhostから呼ぶ実装。APK生成済み、実機受入確認中|
-
-[header](../addon/meltype_abi.h)は共有adapter/Linux factory向けで、`meltype_set_direct`等を含む完全なAndroid APIではありません。宣言だけでproviderのexportを保証せず固定coreのシグネチャと実ELF exportを照合します。保存先・callback登録はprocess全体で最初のsessionより前に行いcallback関数・bridge状態を全sessionより長く保持します。Android factoryのprocess寿命管理は未実装です。JSONはUTF-8です。
-
-## リポジトリと公開の境界
-
-独立plugin repoはMeltype由来のkey mapping・ABI/JSON adapterを含みGPL-3.0-or-later、Copyright 2026 Yukishiroと[NOTICE](../NOTICE)を保持します。依存ライセンス原本も保持しrepo全体を上流GitHub forkへ変える必要はありません。共通C#はMeltype fork、addon/bridgeはこのrepo、レイアウト・theme・IME切替はhost forkが正本です。addonはkey変換とcommit/preedit/candidate eventを担当します。公開は[BUILD](BUILD.md#依存更新と公開)を参照してください。
-
-## キーボードの要求と参照
-
-2026-10-10のユーザー要求「キーボード配列はGboard/ATOKを参考にする」は[plugin #10](https://gitea.honya.dev/honya-dev-forks/meltype-android/issues/10)で追跡します。[host #9](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/issues/9)の既存配列・入力維持、キー分離・隙間・角丸・コントラスト・候補表示要求と紐づけます。本作業にUI実装はありません。
-
-基準はhost `honya/mozc-trial`固定SHAの[TextKeyboard.kt](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/src/commit/6b0fa06ce08f8a0b32dd8df6a0817ee4d31420f4/app/src/main/java/org/fcitx/fcitx5/android/input/keyboard/TextKeyboard.kt)です。[HONYA.md](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/src/commit/6b0fa06ce08f8a0b32dd8df6a0817ee4d31420f4/HONYA.md)の古い「@は記号面のみ」より実装を優先します。
-
-|参照・目的|実装済み基準|提案・受入の境界|
-|---|---|---|
-|ATOK: 配列・記号|ATOK着想QWERTY、数字行、主画面`@`・`.`、記号面、左右矢印|[公式マニュアル](https://www.atok.com/other/support/howtouse/android_pro/manual.html)のパネル切替・候補操作を参考にラベルと入力結果を検証する|
-|Gboard: 配列選択・視認性|QWERTYを初期基準としてhost #9の表示要求を適用。Plex Sans JPキーfont・Pixel明暗theme・キー境界を実装|[Android公式解説](https://www.android.com/intl/ja_jp/articles/466/)のQWERTY/12キー・切替・数字行を比較。12キー/フリック採用は未決定|
-|切替・候補|hostは画面とIME、addonは候補eventを管理|IME切替と配列/記号面切替を区別する|
-
-未確認画面から寸法・位置・色を決めません。採否はhost Issueへ記録し[受入](TESTING.md#hostキーボードの設計受入)で確認します。統合は[plugin #8](https://gitea.honya.dev/honya-dev-forks/meltype-android/issues/8)と[host #10](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/issues/10)で未完了です。

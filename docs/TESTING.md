@@ -106,3 +106,7 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 - Pixel 7 `29081FDH200DGG`、Android 17、arm64-v8a（2026-10-10 15:20 JST追記）: 同じhost/plugin APKはUSB指定前に無線ADBで導入済み。USB指定後は無線操作を停止し、USB接続に切り替えてtest APKを導入。通常instrumentation PASS（1.490秒）、別process reload PASS（0.985秒）。USBでFcitxのIME enable/set成功、有効かつ既定IMEであることを確認。本体/pluginは先の導入を継続使用しています。GUIはユーザーへの解除依頼中で、確認時点ではkeyguard showing=true・画面OFFのためタップ操作を未確認です。解除後のGUI結果はこの正本へ追記予定です。
 
 core PR #8はWindows/macOS runner不足で既存head CIが未実行のため、core→plugin→hostの依存順mergeは保留です。今回の端末追加でソースをmerge済みとは扱いません。未mergeのbranches/worktreesと配布APKを保持します。
+
+## 要件との対応
+
+[要求](REQUIREMENTS.md)・[要件のS/NF/VR対応](SPECIFICATIONS.md)・[基本設計](ARCHITECTURE.md)から本書の実測を参照します。VR-02〜07は上記Androidビルド・通常/reload・GUI試験に対応します。main公開用の要約は[公開main TESTING](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/branch/main/docs/TESTING.md#2026-10-10のandroid受入結果)にあります。

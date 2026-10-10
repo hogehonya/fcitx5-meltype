@@ -23,3 +23,6 @@
 
 - [Core ABI header](native/include/meltype_native.h)
 - [Native include案内](native/include/README.md)
+
+- [要求定義](docs/REQUIREMENTS.md)
+- [要件定義](docs/SPECIFICATIONS.md)
