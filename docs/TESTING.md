@@ -1,6 +1,6 @@
 # 実装後の検証
 
-以下はAndroid実装の受入条件と実行記録です。Android 12 arm64実機で下記の項目が成功しました。他環境と未実施項目は区別し、Linuxの結果をAndroidの合格証拠に流用しません。
+以下はAndroid実装の受入条件と実行記録です。Android 12およびAndroid 16のarm64実機で下記の項目が成功しました。他環境と未実施項目は区別し、Linuxの結果をAndroidの合格証拠に流用しません。
 
 ## ビルド成果物の検証 (自動)
 
@@ -91,9 +91,18 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 
 未実施・制限:
 
-- Android 12以外、plugin最低API 24、16KB page size端末は実機未確認。ELF 16KB alignmentの静的検査成功を16KB実機起動成功とは扱いません。
+- Android 12/16以外、plugin最低API 24、16KB page size端末は実機未確認。ELF 16KB alignmentの静的検査成功を16KB実機起動成功とは扱いません。
 - Settings、UserModel、LanguageMemory、TranslationHistory等、変換履歴以外のJSON用途の実機保存・再読込は未確認。既存IL2026/IL3050警告を抑制していません。
 - Mozc固有learning callbackは未公開で未対応。確認した保存・復元はMeltype側の変換学習です。
-- hardware keyboard、lightテーマの実機視認性、端末rotation、password欄、容量不足等の全受入条件は今回の実機検証に含みません。
+- hardware keyboard、端末rotation、password欄、容量不足等の全受入条件は今回の実機検証に含みません。light表示は下記F-52Eで確認しました。
 - host lintDebugは既存269件（UseAppTint 1、StringFormatMatches 2、MissingTranslation 266）で失敗。今回変更したファイルにあるerrorは0件で、baselineやgate無効化はしていません。
 - Linux-x64 NativeAOT smokeはruntime pack未取得・repository NuGet sources設定によるNU1100で未完了。Android NativeAOTビルドと上記実機reloadで修正を検証しました。
+
+### 追加端末の要求・実機記録（2026-10-10 15:07 JST）
+
+要求者はこの会話のユーザー。親agentから伝達された追加要望は「Pixel 7とF-52Eにも同じ導入」「USB指定」です。既存の配布APKを使い、他IMEを保持したまま追加します。新機能・CI変更・runner新設への範囲拡張ではありません。
+
+- F-52E `ZH2AA2PQFB`、Android 16、arm64-v8a: USBで上記配布host/plugin/test APKを `install -r`、すべて成功。通常instrumentation PASS（1.549秒）、別process reload PASS（0.968秒）。light GUIでMeltypeを選択し、`nihongo`→`日本語`候補表示と確定を確認。証拠は `/tmp/meltype-f52e-nihongo.png` と `/tmp/meltype-f52e-commit.png`。
+- Pixel 7、Android 17、arm64-v8a: 同じhost/plugin APKはUSB指定前に無線ADBで導入済み。USB指定後は無線操作を停止し、USB差替待ち。USB導入確認・instrumentation・GUI確認の成功証拠はまだありません。結果取得後にこの正本へ追記します。
+
+core PR #8はWindows/macOS runner不足で既存head CIが未実行のため、core→plugin→hostの依存順mergeは保留です。今回の端末追加でソースをmerge済みとは扱いません。未mergeのbranches/worktreesと配布APKを保持します。
