@@ -2,7 +2,7 @@
   "lock_version": 1,
   "core": {
     "repository": "https://gitea.honya.dev/honya-dev-forks/meltype.git",
-    "sha": "353995a43d9f43f78e13d8b9530d262d89962068",
+    "sha": "444ce0d6532aa727987e6409b010e91a3889786e",
     "clean_tree_required": true
   },
   "toolchain": {

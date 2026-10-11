@@ -116,6 +116,12 @@ sequenceDiagram
     A->>C: meltype_handle_key
     C-->>A: commit結果
     A->>H: commitString・preedit更新
+    opt 日本語Auto確定後の次語予測
+        C->>B: 空reading・確定context / StartPrediction
+        B-->>C: zero-query次語候補
+        C-->>A: 空preedit・候補view
+        A->>H: 次語候補表示
+    end
 ```
 
 予測候補tapは全文を即確定する。通常Space変換の候補tapは文節選択を更新し、Enterで全文を確定する。図は代表操作の連携を示し、すべてのkeyを固定した状態遷移仕様に置き換えない。
@@ -126,13 +132,18 @@ stateDiagram-v2
     [*] --> NoSession
     NoSession --> Editing: 最初の対応keyでsession作成
     Editing --> Editing: 文字入力・Backspace / preeditと予測更新
-    Editing --> Idle: 予測tap / 全文即確定
+    Editing --> NextWords: 予測tap / 全文確定・次語候補あり
     Editing --> Converting: Space等 / convertingなview
     Converting --> Converting: 候補移動・選択 / view更新
     Converting --> Editing: coreが編集viewを返す
     Editing --> Idle: commit / preeditなし
     Converting --> Idle: commit / preeditなし
     Idle --> Editing: 次の文字入力
+    Idle --> NextWords: 日本語確定・次語候補あり
+    NextWords --> NextWords: 候補tap / 追加確定・次語再予測
+    NextWords --> Editing: 新文字入力 / 古い次語を消去
+    NextWords --> Idle: Backspace・非文字key / 次語を消去
+    NextWords --> NoSession: context破棄
     Editing --> Idle: reset・deactivate / commit
     Converting --> Idle: reset・deactivate / commit
     Idle --> NoSession: context破棄
@@ -148,7 +159,7 @@ stateDiagram-v2
 
 文字列はUTF-8 NUL終端。coreが返すJSONはadapterが`meltype_free`で解放する。callbackの文字列はC++側がmallocし、C#側がfreeする。変換失敗はNULL、候補は改行区切り、文節は`読み\t結果`の改行区切りで渡す。Linux helperのUS/RS protocolをAndroid callbackへそのまま流さない。
 
-任意export `meltype_set_prediction_callback`を最初のsession前に登録する。予測は既存変換callbackと分け、pure日本語Auto編集中の全文だけを対象にする。Androidの操作説明hint非表示はaddonのcompile-time境界で行い、core/providerや候補・キー・Linux表示を変更しない。入力途中の横候補とtap確定をPOBOX参考の範囲とし、確定後の次語予測は意図確認中。部分候補を無効にし、prefix補完を同一読みの学習へ誤登録しない。F6/F7は予測を抑制し、F10の一回変換はpluginがcontext単位に追跡する。
+任意export `meltype_set_prediction_callback`を最初のsession前に登録する。予測は既存変換callbackと分け、pure日本語Auto編集中の全文だけを対象にする。Androidの操作説明hint非表示はaddonのcompile-time境界で行い、core/providerや候補・キー・Linux表示を変更しない。入力途中の横候補とtap確定をPOBOX参考の範囲とし、確定後の次語予測もユーザー2026-10-11要求として実装する。callbackはreading/contextの2引数で、空readingでは直前最大20文字の日本語確定文脈を渡す。bridgeはReconstructHistoryとContext.preceding_text、zero_query_suggestion/mixed_conversionを空query時にのみ指定する。次語tapは追加文字列を確定し連続予測し、新打鍵・空Backspace・フォーカス変更で消去する。候補なしの文脈は非表示。部分候補を無効にし、prefix補完を同一読みの学習へ誤登録しない。F6/F7は予測を抑制し、F10の一回変換はpluginがcontext単位に追跡する。
 
 core exportは排他を提供しないため、呼出しはFcitx event threadで直列化する。callback・bridgeはsessionより長いprocess寿命を持つ。C++/managed例外は各ABI境界で失敗値へ変換し、hostへ漏らさない。addonは結果の削除範囲をすべて検証してからアプリの文字列を編集する。
 

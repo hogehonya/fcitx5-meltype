@@ -16,7 +16,7 @@ Meltypeの英日混在入力をFcitx5で使用し、Android端末でも入力・
 |R-04|Gitea plugin名称をfcitx5-meltypeへ統一し公開先・ビルド・APK入手先を整理する|ユーザー。2026-10-10本会話/[#13](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/13)|3repoの入口を明確にし、未公開APKや未mergeを正確に案内する|
 |R-05|要求定義・要件定義・基本設計・フローその他の図をrepoへ置く|ユーザー。2026-10-10本会話/[#13](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/13)追記|要求から実装と検証を追跡できるようにする。既存設計文書を更新し重複しない|
 
-|R-06|入力途中の予測変換を追加する|ユーザー。2026-10-10「予測変換も追加してほしいな、予測変換がでたら上一行はいらないかも」、[core #9](https://gitea.honya.dev/honya-dev-forks/meltype/issues/9) / [plugin #27](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/27)|候補tap即確定はAgent採用案。2026-10-11に「半透明の凡例」「space 確定＋空白」と特定され、Android操作説明hintだけを非表示とする。2026-10-11「pixel7も修正を」「ドキュメント更新も」で追加端末・正本更新を継続。「POBOXみたいな予測変換」は入力途中の横候補/tap確定へ対応。次語予測は意図確認中|
+|R-06|入力途中の予測変換を追加する|ユーザー。2026-10-10「予測変換も追加してほしいな、予測変換がでたら上一行はいらないかも」、[core #9](https://gitea.honya.dev/honya-dev-forks/meltype/issues/9) / [plugin #27](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/27)|候補tap即確定はAgent採用案。2026-10-11に「半透明の凡例」「space 確定＋空白」と特定され、Android操作説明hintだけを非表示とする。2026-10-11「pixel7も修正を」「ドキュメント更新も」で追加端末・正本更新を継続。「POBOXみたいな予測変換」は入力途中の横候補/tap確定へ対応。2026-10-11「確定後も出せるなら出してみよう」で次語予測も採用（[変更記録](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/27#issuecomment-59533)）|
 |R-07|未確定全文をかな・カナ・英数へ一回変換する|ユーザー。2026-10-10 [かな/カナ #24](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/24) / [英数 #26](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/26)|F6/F7/F10を使用する。永続直接英字モードとは区別し、次compositionへ英数変換を持ち越さない|
 
 ## 実装判断・提案・未決

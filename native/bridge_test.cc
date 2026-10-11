@@ -16,13 +16,15 @@ int main(int argc, char** argv) {
    check(!meltype_mozc_bridge_init("/different-profile"),"different profile rejected");
    check(!meltype_mozc_clauses("",nullptr),"empty clauses");
    check(!meltype_mozc_candidates(nullptr),"null reading");
-   check(!meltype_mozc_predictions(nullptr),"null prediction");
-   check(!meltype_mozc_predictions(""),"empty prediction");
+   check(!meltype_mozc_predictions(nullptr,nullptr),"null prediction");
+   check(!meltype_mozc_predictions("",nullptr),"empty prediction");
    for (int i=0;i<10;++i) {
     char* clauses=meltype_mozc_clauses("きょうは",nullptr);
     check(clauses && std::strchr(clauses,'\t'),"Japanese clauses"); std::free(clauses);
-    char* predicted=meltype_mozc_predictions("にほ");
+    char* predicted=meltype_mozc_predictions("にほ",nullptr);
     check(predicted && std::strstr(predicted,"日本"),"prefix prediction"); std::free(predicted);
+    char* next=meltype_mozc_predictions("","東京");
+    check(next && *next,"next-word prediction"); std::free(next);
     char* candidates=meltype_mozc_candidates("はし");
     check(candidates && std::strstr(candidates,"橋") && std::strchr(candidates,'\n'),"multiple candidates"); std::free(candidates);
    }

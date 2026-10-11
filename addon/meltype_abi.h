@@ -6,7 +6,7 @@
 // Calls and session lifetime are confined to the Fcitx event thread.
 extern "C" {
 int meltype_init(char *(*clauses)(const char *, const char *), char *(*candidates)(const char *), int (*is_word)(const char *));
-void meltype_set_prediction_callback(char *(*predictions)(const char *));
+void meltype_set_prediction_callback(char *(*predictions)(const char *, const char *));
 int meltype_init_mozc(const char *helper, const char *profile);
 int meltype_set_data_directory(const char *absolute_path);
 void *meltype_create();

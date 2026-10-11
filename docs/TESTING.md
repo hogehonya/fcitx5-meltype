@@ -165,4 +165,8 @@ F10取消の独立レビュー指摘を修正：Escape/全Backspaceで未確定�
 
 core353995a headのCIは17context: Ubuntu core push/PRとchanges/repro/accuracyは成功、Linux appとCLAは失敗、Windows/macOS等はpending。統合branch honya/android-aot-learningはprotected=false / enable_status_check=false / contexts=[]。plugin64009ffはstatus0で、honya/android-pluginも必須status checkなし。必須ゲートの解除は行わず、native受入と残CIを分ける。既存main公開PR #8/#11は今回のAndroid統合と別。plugin lint成功、host lintは既存269error/49warning（前回同数、今回変更指摘0）。
 
-APKと最新試験source/hashはDownloads/Meltype-Android-Prediction-20261010/manifest.jsonへ記録。2026-10-11に上行がAndroid操作説明hintと確定し、今回非表示へ変更。凡例非表示の新plugin受入は別途確認。次語予測は意図確認中。host Enter不具合（host #16）は別作業であり、この予測受入成功に含めない。
+APKと最新試験source/hashはDownloads/Meltype-Android-Prediction-20261010/manifest.jsonへ記録。2026-10-11に上行がAndroid操作説明hintと確定し、今回非表示へ変更。凡例非表示の新plugin受入は別途確認。次語予測は2026-10-11ユーザーの「確定後も出せるなら出してみよう」で追加要求となった。旧test52の確定後候補empty期待は次語要件に沿って更新し、旧版PASSを次語受入へ流用しない。host Enter不具合（host #16）は別作業であり、この予測受入成功に含めない。
+
+## 確定後の次語予測（Issue #27、2026-10-11追加要求）
+
+core4予測試験と全190件、managed native ABI build成功。日本語確定後候補/連続tap追加commit、文脈更新、新typing・空Backspaceで古い候補消去、F6/F7/F10明示確定抑制を検証。実Mozc固定archiveへ新bridgeを隔離compile/linkし、「東京」文脈の空queryで次語非空、反復20回free、prefix「にほ」/通常変換回帰に成功。desktop requestのみでは次語非空testがFAILし、空queryのみmixed_conversionを有効にしてPASS。新しいNativeAOT/APK、F-52E/Pixelの次語受入、GUIは未実施であり、上記prefix版受入と分ける。既存profileは使用せず、削除・初期化・学習形式変更をしていない。

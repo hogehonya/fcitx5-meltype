@@ -165,7 +165,7 @@ void Engine::keyEvent(const fcitx::InputMethodEntry &,fcitx::KeyEvent &event) {
         if(modeKey) {
             // Modified mode keys belong to application/global shortcuts.
             if(event.key().states()) return;
-            if(state->session && state->preedit) apply(ic,state->session->commit());
+            if(state->session) apply(ic,state->session->commit());
             state->direct=sym==FcitxKey_Muhenkan;
             ic->updateUserInterface(fcitx::UserInterfaceComponent::StatusArea);
             event.filterAndAccept();
@@ -175,7 +175,7 @@ void Engine::keyEvent(const fcitx::InputMethodEntry &,fcitx::KeyEvent &event) {
         auto key=mapKey(event.key());
         if(!key.vk) {
             // Preserve text order when a non-BMP/unhandled key passes to the app.
-            if(state->session && state->preedit) apply(ic,state->session->commit());
+            if(state->session) apply(ic,state->session->commit());
             return;
         }
         if(!key.modifiers && state->preedit) {

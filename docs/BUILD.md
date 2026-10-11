@@ -155,4 +155,4 @@ core更新はMeltype forkで上流差分と必要変更を検証しlockを検証
 
 Gitea `origin/main`を正本とし、PR・検証・マージ後の同じrevisionを公開GitHub `hogehonya/fcitx5-meltype` の `main`へfast-forwardのみで反映し、公開先の履歴を保持します。現在このrepoにCIは設定されていないため、該当する既存テスト・リンク・diff検査を実行します。今後CIを設定した場合は成功を必須とします。releaseは両main一致確認後に作成しcore/hostと検証範囲を記録します。現在、自動mirrorは設定されていません。
 
-予測対応coreはIssue #27のため353995aへ更新。従来の設定・学習JSON形式を維持し、任意予測callback exportを追加する。古いcore providerではAndroid factoryの追加symbolを解決できないため、lock指定coreからartifactを再生成する。
+予測対応coreはIssue #27の次語要求により444ce0dへ更新。従来の設定・学習JSON形式を維持し、任意予測callback exportを追加する。次語対応でcallback引数はreading/contextの2個になったため、旧353995aのartifactと混用しない。古いcore providerではAndroid factoryの追加symbolを解決できないため、lock指定coreからartifactを再生成する。

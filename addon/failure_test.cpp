@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "engine.h"
 #include <fcitx/inputpanel.h>
+#include <fcitx/candidatelist.h>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -10,6 +11,7 @@ void *meltype_create() { ++creates;return mode==1?nullptr:reinterpret_cast<void 
 void meltype_destroy(void *) { ++destroys; }
 void meltype_free(void *p) { std::free(p); }
 char *meltype_handle_key(void *,int,int,int,const char *,const char *) {
+    if(mode==4) return strdup("{\"consumed\":true,\"commits\":[],\"view\":{\"text\":\"\",\"converting\":false,\"selectedIndex\":-1,\"hint\":\"\",\"candidates\":[\"です\"]}}");
     if(mode==2) return strdup("invalid-json");
     if(mode==3) return strdup("{\"consumed\":true,\"commits\":[{\"deleteBefore\":9,\"text\":\"bad\"}],\"view\":null}");
     return strdup("{\"consumed\":true,\"commits\":[],\"view\":{\"text\":\"a\",\"converting\":false,\"selectedIndex\":0,\"hint\":\"\",\"candidates\":[]}}");
@@ -40,6 +42,10 @@ int main(){
  mode=0;send();require(creates==3); // Failed pending state is discarded.
  mode=3;send();require(destroys==2 && context.commits==0 && context.deletes==0);
  mode=0;send();require(creates==4);
+ mode=4;send();require(context.inputPanel().clientPreedit().empty() && context.inputPanel().candidateList());
+ fcitx::KeyEvent direct(&context,fcitx::Key(FcitxKey_Muhenkan));
+ engine.keyEvent(fcitx::InputMethodEntry("meltype","Meltype","ja","meltype"),direct);
+ require(direct.accepted() && !context.inputPanel().candidateList() && context.commits==0);
  std::cout<<"initialization, JSON and unsafe deletion recovery PASS\n";
  }catch(const std::exception &e){std::cerr<<e.what()<<"\n";return 1;}
 }
