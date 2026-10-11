@@ -36,6 +36,26 @@ class Bridge {
       .SetRequestView(request_).SetConfigView(config_).SetOptions(std::move(options)).Build();
     return converter_->StartConversion(request, segments);
   }
+  bool Predict(const char* reading, const char* context, mozc::Segments* segments) {
+    if (!reading || (!*reading && (!context || !*context))) return false;
+    const bool next_word = !*reading;
+    if (next_word) (void)converter_->ReconstructHistory(segments, context);
+    mozc::commands::Request prediction_request = request_;
+    prediction_request.set_zero_query_suggestion(next_word);
+    prediction_request.set_mixed_conversion(next_word);
+    mozc::commands::Context prediction_context;
+    if (context) prediction_context.set_preceding_text(context);
+    composer_.Reset();
+    composer_.SetPreeditTextForTestOnly(reading);
+    mozc::ConversionRequest::Options options = {
+      .request_type = mozc::ConversionRequest::PREDICTION,
+      .max_dictionary_prediction_candidates_size = 20,
+      .create_partial_candidates = false,
+    };
+    auto request = mozc::ConversionRequestBuilder().SetComposer(composer_)
+      .SetRequestView(prediction_request).SetContextView(prediction_context).SetConfigView(config_).SetOptions(std::move(options)).Build();
+    return converter_->StartPrediction(request, segments);
+  }
  private:
   std::unique_ptr<mozc::Engine> engine_;
   const mozc::commands::Request request_;
@@ -99,6 +119,21 @@ extern "C" char* meltype_mozc_candidates(const char* reading) {
     }
     const auto& segment=segments.conversion_segment(0);
     for (size_t i=0; i<segment.candidates_size(); ++i) {
+      if (!text.empty()) text+='\n';
+      text+=segment.candidate(i).value;
+    }
+    return Copy(text);
+  } catch (...) { return nullptr; }
+}
+
+extern "C" char* meltype_mozc_predictions(const char* reading, const char* context) {
+  try {
+    mozc::Segments segments;
+    if (!bridge || !bridge->Predict(reading, context, &segments) || segments.conversion_segments_size()!=1) return nullptr;
+    const auto& segment=segments.conversion_segment(0);
+    std::string text;
+    for (size_t i=0; i<segment.candidates_size() && i<20; ++i) {
+      if (segment.candidate(i).value.empty()) continue;
       if (!text.empty()) text+='\n';
       text+=segment.candidate(i).value;
     }

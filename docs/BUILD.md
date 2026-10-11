@@ -14,7 +14,7 @@ core/toolchain/ABI固定値の正本は [`scripts/deps.lock.json`](../scripts/de
 
 |依存|固定revision|用途|
 |---|---|---|
-|[Meltype fork](https://gitea.honya.dev/honya-dev-forks/meltype/src/commit/87b1ae13e95144266f9e69d8b20d42f00aa0e26e)|`87b1ae13e95144266f9e69d8b20d42f00aa0e26e`|net10.0 core、C ABI。NativeAOT build の入力|
+|[Meltype fork](https://gitea.honya.dev/honya-dev-forks/meltype/src/commit/353995a43d9f43f78e13d8b9530d262d89962068)|`353995a43d9f43f78e13d8b9530d262d89962068`|net10.0 core、C ABI。NativeAOT build の入力|
 |.NET SDK|`10.0.100`|NativeAOT の publish|
 |Android NDK|`28.0.13004108`|Bionic arm64 のリンクと `llvm-readelf` による検証|
 |RID / ABI|`linux-bionic-arm64` / `arm64-v8a`|build と成果物の対象|
@@ -44,7 +44,7 @@ clean な作業ツリーを渡します。毎回新しい場所へ clone し、�
 set -euo pipefail
 core_root=$(mktemp -d "${TMPDIR:-/tmp}/meltype-core.XXXXXXXX")
 git clone https://gitea.honya.dev/honya-dev-forks/meltype.git "$core_root/core"
-git -C "$core_root/core" checkout --detach 87b1ae13e95144266f9e69d8b20d42f00aa0e26e
+git -C "$core_root/core" checkout --detach 444ce0d6532aa727987e6409b010e91a3889786e
 ```
 
 この調査環境では次のものを使いました。版は script が `--dotnet` / `--ndk-dir` の実物から確認します。
@@ -85,7 +85,7 @@ restore するには取得先が必要です。既存`linux/build.sh`と同様�
 
 4. `llvm-readelf` で `ELF64` / `AArch64` / `DYN` と little endian、必須 export 9 個
    (`meltype_init` / `meltype_create` / `meltype_destroy` / `meltype_handle_key` / `meltype_commit` /
-   `meltype_select_candidate` / `meltype_set_direct` / `meltype_free` / `meltype_set_data_directory`)、
+   `meltype_select_candidate` / `meltype_set_direct` / `meltype_free` / `meltype_set_data_directory` / `meltype_set_prediction_callback`)、
    全 `LOAD` の `p_align >= 16384`、`SONAME=libMeltypeNative.so` を検証する。`SONAME` と `NEEDED` は記録する。
 5. `lib/arm64-v8a/libMeltypeNative.so`、`manifest.json`、`LICENSE` と `THIRD-PARTY-NOTICES.md` の原本、
    `logs/publish.log` (IL2026/IL3050 の JSON AOT 警告を含む)、`README.md` を残す。
@@ -154,3 +154,5 @@ APK packaging 側の alignment は別途確認します。[16KB公式手順](htt
 core更新はMeltype forkで上流差分と必要変更を検証しlockを検証済みrevisionへ更新します。ABIシグネチャ・実export・JSON schema・所有権の互換性とライセンスを照合し回帰試験と実buildを行います。host更新は本書のSHAとsubmodule/build条件・キーボード基準を再確認します。統合後は端末回帰試験も行い未実施はIssueへ記録します。Linux provider版は[addon](../addon/README.md)で別管理します。
 
 Gitea `origin/main`を正本とし、PR・検証・マージ後の同じrevisionを公開GitHub `hogehonya/fcitx5-meltype` の `main`へfast-forwardのみで反映し、公開先の履歴を保持します。現在このrepoにCIは設定されていないため、該当する既存テスト・リンク・diff検査を実行します。今後CIを設定した場合は成功を必須とします。releaseは両main一致確認後に作成しcore/hostと検証範囲を記録します。現在、自動mirrorは設定されていません。
+
+予測対応coreはIssue #27の次語要求により444ce0dへ更新。従来の設定・学習JSON形式を維持し、任意予測callback exportを追加する。次語対応でcallback引数はreading/contextの2個になったため、旧353995aのartifactと混用しない。古いcore providerではAndroid factoryの追加symbolを解決できないため、lock指定coreからartifactを再生成する。

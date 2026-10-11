@@ -2,7 +2,7 @@
   "lock_version": 1,
   "core": {
     "repository": "https://gitea.honya.dev/honya-dev-forks/meltype.git",
-    "sha": "87b1ae13e95144266f9e69d8b20d42f00aa0e26e",
+    "sha": "444ce0d6532aa727987e6409b010e91a3889786e",
     "clean_tree_required": true
   },
   "toolchain": {
@@ -42,7 +42,8 @@
     "meltype_select_candidate",
     "meltype_set_direct",
     "meltype_free",
-    "meltype_set_data_directory"
+    "meltype_set_data_directory",
+    "meltype_set_prediction_callback"
   ],
   "license_files": [
     "LICENSE",

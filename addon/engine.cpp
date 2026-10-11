@@ -98,7 +98,7 @@ void Engine::clear(fcitx::InputContext *ic) noexcept {
     } catch(...) { /* Host callbacks cannot escape an error recovery path. */ }
 }
 void Engine::recover(fcitx::InputContext *ic,State *state) noexcept {
-    if(state) { state->session.reset(); state->preedit=false; }
+    if(state) { state->session.reset(); state->preedit=false; state->alphanumericConversion=false; }
     clear(ic);
 }
 bool Engine::apply(fcitx::InputContext *ic,const nlohmann::json &value) {
@@ -126,9 +126,12 @@ bool Engine::apply(fcitx::InputContext *ic,const nlohmann::json &value) {
         fcitx::Text preedit(text,fcitx::TextFormatFlag::Underline);
         preedit.setCursor(text.size()); panel.setClientPreedit(preedit);
         state->preedit=!text.empty();
+#ifndef __ANDROID__
         panel.setAuxUp(fcitx::Text(view.at("hint").get<std::string>()));
+#endif
         auto candidates=view.at("candidates").get<std::vector<std::string>>();
-        if(view.at("converting").get<bool>() && candidates.size()>1) {
+        const bool converting=view.at("converting").get<bool>();
+        if((converting && candidates.size()>1) || (!converting && !candidates.empty())) {
             auto list=std::make_unique<fcitx::CommonCandidateList>();
             list->setPageSize(9); list->setLayoutHint(fcitx::CandidateLayoutHint::Vertical);
             list->setLabels();
@@ -139,6 +142,14 @@ bool Engine::apply(fcitx::InputContext *ic,const nlohmann::json &value) {
         }
     }
     ic->updatePreedit(); ic->updateUserInterface(fcitx::UserInterfaceComponent::InputPanel);
+    if(state->alphanumericConversion && !state->preedit) {
+        state->alphanumericConversion=false;
+        // A cancelled conversion must not affect the next normal commit.
+        if(!commits.empty()) {
+            // F10 is a one-composition conversion, not an English context switch.
+            state->session.reset();
+        }
+    }
     return value.at("consumed").get<bool>();
 }
 void Engine::keyEvent(const fcitx::InputMethodEntry &,fcitx::KeyEvent &event) {
@@ -154,7 +165,7 @@ void Engine::keyEvent(const fcitx::InputMethodEntry &,fcitx::KeyEvent &event) {
         if(modeKey) {
             // Modified mode keys belong to application/global shortcuts.
             if(event.key().states()) return;
-            if(state->session && state->preedit) apply(ic,state->session->commit());
+            if(state->session) apply(ic,state->session->commit());
             state->direct=sym==FcitxKey_Muhenkan;
             ic->updateUserInterface(fcitx::UserInterfaceComponent::StatusArea);
             event.filterAndAccept();
@@ -164,8 +175,13 @@ void Engine::keyEvent(const fcitx::InputMethodEntry &,fcitx::KeyEvent &event) {
         auto key=mapKey(event.key());
         if(!key.vk) {
             // Preserve text order when a non-BMP/unhandled key passes to the app.
-            if(state->session && state->preedit) apply(ic,state->session->commit());
+            if(state->session) apply(ic,state->session->commit());
             return;
+        }
+        if(!key.modifiers && state->preedit) {
+            if(sym==FcitxKey_F10) state->alphanumericConversion=true;
+            else if(sym==FcitxKey_F6 || sym==FcitxKey_F7 || sym==FcitxKey_F9)
+                state->alphanumericConversion=false;
         }
         if(!state->session) state->session=std::make_unique<Session>();
         auto [before,after]=state->preedit?std::pair<std::string,std::string>{}:surrounding(ic);
@@ -191,7 +207,14 @@ void Engine::reset(const fcitx::InputMethodEntry &,fcitx::InputContextEvent &eve
         else clear(ic);
     } catch(const std::exception &) { FCITX_ERROR() << "Meltype reset failed"; recover(ic,state); }
 }
-void Engine::deactivate(const fcitx::InputMethodEntry &entry,fcitx::InputContextEvent &event) { reset(entry,event); }
+void Engine::deactivate(const fcitx::InputMethodEntry &entry,fcitx::InputContextEvent &event) {
+    if(event.type()!=fcitx::EventType::InputContextFocusOut) { reset(entry,event); return; }
+    // Fcitx already commits client preedit, unless ClientUnfocusCommit delegates
+    // it to the client. Never submit that same text again on focus loss.
+    auto *ic=event.inputContext();
+    try { recover(ic,ic->propertyFor(&factory_)); }
+    catch(const std::exception &) { clear(ic); }
+}
 void Engine::select(fcitx::InputContext *ic,int index) {
     State *state=nullptr;
     try {

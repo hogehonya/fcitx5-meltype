@@ -13,6 +13,7 @@ int meltype_mozc_bridge_init(const char *profile_absolute);
 void meltype_mozc_bridge_shutdown(void);
 char *meltype_mozc_clauses(const char *reading, const char *context);
 char *meltype_mozc_candidates(const char *reading);
+char *meltype_mozc_predictions(const char *reading, const char *context);
 #ifdef __cplusplus
 }
 #endif

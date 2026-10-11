@@ -16,6 +16,7 @@
 - `llvm-readelf` で `ELF64` / `AArch64` / `DYN` (little endian) である
 - `meltype_init` / `meltype_create` / `meltype_destroy` / `meltype_handle_key` / `meltype_commit` /
   `meltype_select_candidate` / `meltype_set_direct` / `meltype_free` / `meltype_set_data_directory`
+ / `meltype_set_prediction_callback`
   が定義済みシンボルとして export されている (`meltype_init@@V1.0` のような版付きも可)
 - すべての `LOAD` セグメントの `p_align` が 16384 以上
 - 成果物の SHA256 が manifest の記録と一致し、元 core に build 出力が残っていない
@@ -138,8 +139,75 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 
 2026-10-10、Linux配布v1.0.0 provider/helper、Fcitx5 5.1.12、G++14.2.0を同じ固定入力として使用。新受入testを旧engineへ適用すると `Muhenkan consumed` でintegration失敗（Red）、実装後はctest 2/2成功。直接キーpass-through、通常Meltype復帰、context独立、pending/候補の一回commit、release/修飾キー保持、mode表示/解除後保持を検証した。`addon/README.md`のcmake/ctest手順を利用し、HOME/Mozc profileは `/home/honya/tmp/fcitx5-english-mode/green-home` に隔離した。GUI検証は別途Issue #20へ記録し、ここで実行済みとは扱わない。既存Android APK・対応ソースassetは変更しない。
 
-## Android未確定文字列のかな変換（Issue #24）
+## 実装ブランチの履歴（2026-10-10〜11）
+
+以下は各試験時点の記録です。未merge・CI pending・Pixel未実施の記述は当時の状態を示し、最新の配布・Pixel結果は末尾のalpha1差し替え公開記録を参照してください。統合作業は[Issue #36](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/36)で追跡します。
+
+## 入力途中の予測（Issue #27）
+
+core予測3件と全189件、Native ABI managed build、plugin Python30件が成功。純日本語入力途中候補、tap即確定、未完ローマ字抑制、Backspace再表示、通常Space変換、provider失敗/英数を検証。新bridge sourceを隔離/tmp objectへcompileし、既存の固定Mozc archivesとlinkした実engine試験で「にほ」→「日本」包含、NULL/空入力、反復20回の予測freeと通常変換回帰が成功。上流deprecated警告、空の隔離profileに対する未作成辞書/historyログを記録。新artifact・APK GUIは統合担当が別途検証し、core/bridge成功を代用しない。当時は上行の意図確認待ちだったが、2026-10-11の指定によりAndroid操作説明hintだけを非表示にする。
+
+## かな・カナの一回変換（Issue #24）
 
 要求出所は2026-10-10のユーザー発言「漢字かな混じりではなくカナだけ、かなだけに変換できるようにしたい」。画面の直接英字切替キーを「かな」「カナ」に置き換え、core既存F6/F7による未確定文字列全体の読み変換を使用する。物理無変換の直接英字機能は維持する。永続かな入力モード・12key配列・英単語の日本語発音への翻訳は対象外。
 
 実core integrationは`nihongo`のlive入力/候補表示中それぞれからF6→`にほんご`、F7→`ニホンゴ`、候補消去、Enter完全一致、次入力の通常`日本語`復帰を確認する。Android instrumentation `MeltypeTest -e phase script`は画面と同じaction helperを使用し、上記に加えて直接英字から通常復帰・空のF6/F7非転送を確認する。実機結果はIssue #24へ記録する。engine/core変更なしでplugin39 APKを再利用、host/testのみ生成する。
+
+## F10の一回変換と次composition（Issue #26）
+
+2026-10-10の画面「英数」要求は未確定文字列の一回変換として採用。Pixelのlive/候補中F10確定は成功したが、続くnihongoが英字になり受入失敗。coreは表示モードをAutoへ戻しても直前英語文脈を保持するため、pluginはIC単位にF10変換を追跡し、確定後にcore sessionを破棄、次compositionで再作成する。保存データは変更・削除しない。F6/F7/F9へ変更した場合はF10追跡を解除する。物理無変換の直接英字は従来どおり。
+
+Linux実NativeAOT配布v1.0.0/helperによる2回F10確定→次nihongoのintegrationは旧engineでFAILを再現（Red）。修正後integrationと異常回復2/2 PASS（1.04秒）。初回F10一回だけではRedを再現しなかったため、実機の二回確定と一致させた。Android core87/providerは変更せずpluginのみ再生成する。Pixel修正版受入は未実行でIssue #26へ追記する。
+
+F10取消の独立レビュー指摘を修正：Escape/全Backspaceで未確定文字列が空になった場合は追跡フラグのみ解除し、sessionと通常入力文脈は保持する。両取消ケースで確定なし、その後の通常英語入力文脈がF10を使わない基準ICと一致することを実coreで確認。integration/異常回復2/2 PASS（1.37秒）。
+
+## 2026-10-11 予測対応版のF-52E USB受入
+
+製品sourceはcore353995a / plugin64009ff / host047277e6。製品host49/plugin49を保持し、試験だけhost1e0295f9のtest52へ更新した。predictionは1.626秒、通常test51は1.908秒、reload test51は1.14秒、english test49は1.233秒、toggle test49は2.257秒ですべてPASS。予測「にほ」→「日本」包含・候補tap全文確定、未完h追加で候補消去・Backspaceで復帰、Space文節選択→全文commit、F6/F7予測抑制、学習の別process再読込、F10後通常復帰を検証した。
+
+旧試験のFAILは、かな1文字削除へ「にh」を期待した操作不整合、先行予測イベントをSpace候補と誤取得したqueue使用、文節候補「に」と全文commit「に歩」を同一視した期待に分離し、host04de6f95/6feb48d2/1e0295f9で試験を修正した。製品の削除・文節確定動作は変更していない。今回GUIはSignal/ATOK画面を保護し未操作。Pixel 7の今回版更新/受入は継続中で、過去版成功を今回版へ流用しない。
+
+core353995a headのCIは17context: Ubuntu core push/PRとchanges/repro/accuracyは成功、Linux appとCLAは失敗、Windows/macOS等はpending。統合branch honya/android-aot-learningはprotected=false / enable_status_check=false / contexts=[]。plugin64009ffはstatus0で、honya/android-pluginも必須status checkなし。必須ゲートの解除は行わず、native受入と残CIを分ける。既存main公開PR #8/#11は今回のAndroid統合と別。plugin lint成功、host lintは既存269error/49warning（前回同数、今回変更指摘0）。
+
+APKと最新試験source/hashはDownloads/Meltype-Android-Prediction-20261010/manifest.jsonへ記録。2026-10-11に上行がAndroid操作説明hintと確定し、今回非表示へ変更。凡例非表示の新plugin受入は別途確認。次語予測は2026-10-11ユーザーの「確定後も出せるなら出してみよう」で追加要求となった。旧test52の確定後候補empty期待は次語要件に沿って更新し、旧版PASSを次語受入へ流用しない。host Enter不具合（host #16）は別作業であり、この予測受入成功に含めない。
+
+## 確定後の次語予測（Issue #27、2026-10-11追加要求）
+
+core4予測試験と全190件、managed native ABI build成功。日本語確定後候補/連続tap追加commit、文脈更新、新typing・空Backspaceで古い候補消去、F6/F7/F10明示確定抑制を検証。実Mozc固定archiveへ新bridgeを隔離compile/linkし、「東京」文脈の空queryで次語非空、反復20回free、prefix「にほ」/通常変換回帰に成功。desktop requestのみでは次語非空testがFAILし、空queryのみmixed_conversionを有効にしてPASS。新しいNativeAOT/APK、F-52E/Pixelの次語受入、GUIは未実施であり、上記prefix版受入と分ける。既存profileは使用せず、削除・初期化・学習形式変更をしていない。
+
+次語core `444ce0d6532aa727987e6409b010e91a3889786e` のAndroid NativeAOT生成成功。export10件/ELF16KB LOAD alignmentを確認、library SHA256 `b263a94729a2aa6a1ad8443dd9e74c8c0b27c0accdf532983fea850c16369747`。plugin source `4ca576d`、Android統合branch競合解消merge `8971b5d` は同一tree。最新headのcore CI17contextは取得時すべてpending、plugin status0。両Android統合branchは必須status checkなし（既存設定を変更していない）、PR 10/29はmerge可能だが次語実機受入まで未merge。辞書probeは東京→🗼、東京🗼→候補なしであり、全ての文脈で次語非空を保証しない。語彙と順序を固定せず、次語なしを正常として扱う。
+
+## 2026-10-11 次語統合版 F-52E native受入
+
+成果物host62/plugin62/test63（host build52e506a9、test54952f10、plugin製品4ca576d/core444ce0d）をUSBでinstall-r成功。Enter 3件0.321秒、nextword 1件2.282秒、prediction 1件1.568秒、toggle 1件2.113秒、english 1件1.479秒、reload 1件1.572秒がPASS。raw profile保護例外なし。normalは開始前のUSB切断でdevice not foundとなり未実施。旧製品のnormal成功を最新版normal成功としない。
+
+GUIの凡例非表示は未確認、Pixel 7はUSB未接続・無線操作の許諾未回答で最新版未導入/未受入。成果物と署名/全SHAはDownloads/Meltype-Android-Nextword-20261011/manifest.json。最新core head444ce0dのCI17contextは全pending、plugin head2155ba0にCIはない（status0）。CI成功確認要件を満たすまでPR 10/29は未merge、PR28のsuperseded closeも統合確認まで保留する。Android統合branchの必須status設定がないことをCI成功の代わりにしない。
+
+## F-52E GUI確認（current、2026-10-11）
+
+ユーザーから合成テスト文の送信を明示許可されたSignal editorで、ソフトキーによる「日本語のテストです」の読み入力→Space変換→下線付きpreeditを確認した。1回目のEnterで下線が消えて確定し、送信されなかった。2回目のEnterはこのeditor設定では改行となった。許可済みの送信ボタンで合成文を送信し、outgoing bubbleを確認。候補行が表示され、半透明aux操作説明凡例がないことも確認した。これはcurrentの観測結果であり、他editor設定やPixelでの確認を代用しない。private screenshot、相手名、会話内容はrepo/成果物へ保存しない。Pixel、最新版normal未実施、CI pending/noCIによるmerge保留は継続する。
+
+## FocusOut送信後の再commit（Issue #30）
+
+source3134d2f。旧engineへ追加addon境界fixtureを適用すると、clientが送信済みと想定したpreeditをdeactivate(FocusOut)で再commitし、`FocusOut must not recommit already submitted preedit`でFAIL（Red）。最小修正後はClientUnfocusCommit有無両方で追加commitなし、session破棄/次入力再生成、空次語候補clear、通常reset/IME切替commit保持がPASS（Green）。これはengine呼出しのmock境界試験であり、Fcitx Instance/JNI実イベントはhost editorclear受入で別確認する。Linux addon全target build・failure ctest・Python30件成功。当時は実core integration/Android plugin build/F52Signal再受入が未実施だった。後続結果を以下へ記録する。
+
+FocusOut修正版plugin `0.1.3-68-g30d15019`（製品3134d2f、docs32ccffe、host metadata30d15019）のassembleDebug成功。正規check-plugin-apkでarm64-only/ELF16KB/loader/config検査PASS、apksigner検証PASS、APK内core SHAは固定444ce0dのAOT `b263a94729a2aa6a1ad8443dd9e74c8c0b27c0accdf532983fea850c16369747`と一致。plugin APK SHA `b49cda15de3d4f444d620dc765497daa80d3bdffde3484e7c0ef432189cfaa38`、host62は保持。Downloads/Meltype-Android-Focusout-20261011/manifest.jsonへ記録。
+
+同一invocationのassembleDebug+lintDebugではgenerateDataDescriptor→generateDebugLintReportModelのGradle implicit dependency検証がFAILしたが、native compile/APK生成は成功。既存正規のstandalone lintDebug再実行は46秒SUCCESS（root17385）、ゲート無効化なし。このbuild検査時点の端末Red/GreenとSignal GUIは未実施だった。後続JNI試験とGUIを分離して記録する。
+
+### F-52E実JNI editorclear Red/Green
+
+host test source `0eb89388ebc453aecda81e1ae56ffd809c109c4e` / test71生成SUCCESS（50秒）・install成功。保持host62と旧plugin62ではeditorclearが1.521秒でFAIL、`expected 0 commits, was 1`を再現した。同じtestで新plugin68をinstall-r成功後、editorclearは1.822秒PASS。これは隔離editorからFcitx Instance/JNI FocusOut境界を通したRed/Greenであり、直接mock試験を補完する。新Signal GUI再受入と追加native回帰は未完。Pixel未実施、core CI pendingによるmerge保留を継続する。test APK/署名/SHAはFocusout manifestへ保存し、private画像・会話を保存しない。
+
+### F-52E Signal 8.30.3修正後GUI
+
+ユーザーの明示送信許可により、新plugin68で合成文「日本語のテストです」をSpace変換し、未確定下線・候補を確認した。アプリ送信ボタンを1回押すとoutgoing bubbleと送信完了チェックが表示され、入力欄・候補が空になった。約20秒後も再投入なし、GUI再受入PASS。private screenshot/相手情報/会話内容は保存しない。実JNI Red/Greenとは別の証拠として記録する。Pixelと追加native回帰は今回未確認、CI pending/noCIのためPR未mergeを保持する。
+## 2026-10-11 alpha1差し替え公開の確認範囲
+
+ユーザーの「公開版の差し替えとリポジトリ更新」をIssue #32で追跡する。最新版はhost62/plugin68/core444ce0d。機能追加段階のF-52E USBでEnter3件、次語、予測、あア/英数、直接英字、学習再読込の隔離instrumentationが成功した（旧plugin62等）。plugin68でこれら全項目の追加native回帰は未実施である。通常phaseはUSB切断により未実施。focus-out境界は同一test71で旧plugin62 FAIL（1.521秒、commit expected0/actual1）→修正plugin68 PASS（1.822秒）。テストプロフィール全バイトの原状復帰を確認した。
+
+親は明示された送信許諾の下で合成文をGUI検証し、Space変換後Enter1回は確定だけ、次Enterはeditor設定に従った改行を確認した。修正plugin68では未確定下線のある合成文を送信ボタンで送信し、入力欄・候補が空、20秒後も再投入なしを確認した。個人の会話、相手名、private画像は収録しない。隔離JNI試験と当該アプリGUIの証拠を分け、通知順序の完全再現や他アプリの網羅検証とは扱わない。
+
+Pixel7 Android17はユーザーの無線更新許諾後、host62/plugin68/test71のinstall-rが各成功。editorclear 1件PASS（1.599秒）、EditorReturnActionTest 3件PASS（0.218秒）、nextword 1件PASS（1.74秒）。プロフィール全バイトは試験前後同一、Fcitx/Meltype選択を維持した。GUIはkeyguard/Dozingのため未確認でロックを越える操作は行わず、他のnative回帰は未実行。個人プロフィール、端末serial、private画像は収録しない。初版の3台検証は過去記録として保持する。API24下限/16KB page/他JSON用途/全focus等は未確認。core等の必要CIは未完で実装PRは未merge、app lintは既存269 errors/49 warningsで失敗し変更対象指摘0件。alpha1差し替え公開後に4assetを再取得し配布前原本との完全一致、SHA256SUMSとZIP内2APKのhash一致を確認した。正本はReleaseのmanifest/SHA256SUMSである。既存tag位置はa77a324のまま、Pre-releaseを維持し、対応ソースは添付archiveを使う。
+
+公開4assetは公開時点の固定記録として維持し、後続のPixel検証はRelease本文とこの文書に追記する。配布ソース・APKは変更していない。
