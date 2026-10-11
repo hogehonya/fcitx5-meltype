@@ -178,3 +178,7 @@ core4予測試験と全190件、managed native ABI build成功。日本語確定
 成果物host62/plugin62/test63（host build52e506a9、test54952f10、plugin製品4ca576d/core444ce0d）をUSBでinstall-r成功。Enter 3件0.321秒、nextword 1件2.282秒、prediction 1件1.568秒、toggle 1件2.113秒、english 1件1.479秒、reload 1件1.572秒がPASS。raw profile保護例外なし。normalは開始前のUSB切断でdevice not foundとなり未実施。旧製品のnormal成功を最新版normal成功としない。
 
 GUIの凡例非表示は未確認、Pixel 7はUSB未接続・無線操作の許諾未回答で最新版未導入/未受入。成果物と署名/全SHAはDownloads/Meltype-Android-Nextword-20261011/manifest.json。最新core head444ce0dのCI17contextは全pending、plugin head2155ba0にCIはない（status0）。CI成功確認要件を満たすまでPR 10/29は未merge、PR28のsuperseded closeも統合確認まで保留する。Android統合branchの必須status設定がないことをCI成功の代わりにしない。
+
+## F-52E GUI確認（current、2026-10-11）
+
+ユーザーから合成テスト文の送信を明示許可されたSignal editorで、ソフトキーによる「日本語のテストです」の読み入力→Space変換→下線付きpreeditを確認した。1回目のEnterで下線が消えて確定し、送信されなかった。2回目のEnterはこのeditor設定では改行となった。許可済みの送信ボタンで合成文を送信し、outgoing bubbleを確認。候補行が表示され、半透明aux操作説明凡例がないことも確認した。これはcurrentの観測結果であり、他editor設定やPixelでの確認を代用しない。private screenshot、相手名、会話内容はrepo/成果物へ保存しない。Pixel、最新版normal未実施、CI pending/noCIによるmerge保留は継続する。
