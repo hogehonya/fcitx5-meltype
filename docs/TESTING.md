@@ -139,6 +139,10 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 
 2026-10-10、Linux配布v1.0.0 provider/helper、Fcitx5 5.1.12、G++14.2.0を同じ固定入力として使用。新受入testを旧engineへ適用すると `Muhenkan consumed` でintegration失敗（Red）、実装後はctest 2/2成功。直接キーpass-through、通常Meltype復帰、context独立、pending/候補の一回commit、release/修飾キー保持、mode表示/解除後保持を検証した。`addon/README.md`のcmake/ctest手順を利用し、HOME/Mozc profileは `/home/honya/tmp/fcitx5-english-mode/green-home` に隔離した。GUI検証は別途Issue #20へ記録し、ここで実行済みとは扱わない。既存Android APK・対応ソースassetは変更しない。
 
+## 実装ブランチの履歴（2026-10-10〜11）
+
+以下は各試験時点の記録です。未merge・CI pending・Pixel未実施の記述は当時の状態を示し、最新の配布・Pixel結果は末尾のalpha1差し替え公開記録を参照してください。統合作業は[Issue #36](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/36)で追跡します。
+
 ## 入力途中の予測（Issue #27）
 
 core予測3件と全189件、Native ABI managed build、plugin Python30件が成功。純日本語入力途中候補、tap即確定、未完ローマ字抑制、Backspace再表示、通常Space変換、provider失敗/英数を検証。新bridge sourceを隔離/tmp objectへcompileし、既存の固定Mozc archivesとlinkした実engine試験で「にほ」→「日本」包含、NULL/空入力、反復20回の予測freeと通常変換回帰が成功。上流deprecated警告、空の隔離profileに対する未作成辞書/historyログを記録。新artifact・APK GUIは統合担当が別途検証し、core/bridge成功を代用しない。当時は上行の意図確認待ちだったが、2026-10-11の指定によりAndroid操作説明hintだけを非表示にする。
@@ -198,3 +202,12 @@ host test source `0eb89388ebc453aecda81e1ae56ffd809c109c4e` / test71生成SUCCES
 ### F-52E Signal 8.30.3修正後GUI
 
 ユーザーの明示送信許可により、新plugin68で合成文「日本語のテストです」をSpace変換し、未確定下線・候補を確認した。アプリ送信ボタンを1回押すとoutgoing bubbleと送信完了チェックが表示され、入力欄・候補が空になった。約20秒後も再投入なし、GUI再受入PASS。private screenshot/相手情報/会話内容は保存しない。実JNI Red/Greenとは別の証拠として記録する。Pixelと追加native回帰は今回未確認、CI pending/noCIのためPR未mergeを保持する。
+## 2026-10-11 alpha1差し替え公開の確認範囲
+
+ユーザーの「公開版の差し替えとリポジトリ更新」をIssue #32で追跡する。最新版はhost62/plugin68/core444ce0d。機能追加段階のF-52E USBでEnter3件、次語、予測、あア/英数、直接英字、学習再読込の隔離instrumentationが成功した（旧plugin62等）。plugin68でこれら全項目の追加native回帰は未実施である。通常phaseはUSB切断により未実施。focus-out境界は同一test71で旧plugin62 FAIL（1.521秒、commit expected0/actual1）→修正plugin68 PASS（1.822秒）。テストプロフィール全バイトの原状復帰を確認した。
+
+親は明示された送信許諾の下で合成文をGUI検証し、Space変換後Enter1回は確定だけ、次Enterはeditor設定に従った改行を確認した。修正plugin68では未確定下線のある合成文を送信ボタンで送信し、入力欄・候補が空、20秒後も再投入なしを確認した。個人の会話、相手名、private画像は収録しない。隔離JNI試験と当該アプリGUIの証拠を分け、通知順序の完全再現や他アプリの網羅検証とは扱わない。
+
+Pixel7 Android17はユーザーの無線更新許諾後、host62/plugin68/test71のinstall-rが各成功。editorclear 1件PASS（1.599秒）、EditorReturnActionTest 3件PASS（0.218秒）、nextword 1件PASS（1.74秒）。プロフィール全バイトは試験前後同一、Fcitx/Meltype選択を維持した。GUIはkeyguard/Dozingのため未確認でロックを越える操作は行わず、他のnative回帰は未実行。個人プロフィール、端末serial、private画像は収録しない。初版の3台検証は過去記録として保持する。API24下限/16KB page/他JSON用途/全focus等は未確認。core等の必要CIは未完で実装PRは未merge、app lintは既存269 errors/49 warningsで失敗し変更対象指摘0件。alpha1差し替え公開後に4assetを再取得し配布前原本との完全一致、SHA256SUMSとZIP内2APKのhash一致を確認した。正本はReleaseのmanifest/SHA256SUMSである。既存tag位置はa77a324のまま、Pre-releaseを維持し、対応ソースは添付archiveを使う。
+
+公開4assetは公開時点の固定記録として維持し、後続のPixel検証はRelease本文とこの文書に追記する。配布ソース・APKは変更していない。
