@@ -14,15 +14,15 @@
 
 ## AndroidのビルドとAPK入手
 
-2026-10-10時点でAndroid arm64-v8aのhost・plugin・instrumentation APKをビルドし、moto g31（Android 12）、F-52E（Android 16）、Pixel 7（Android 17）へ導入しました。3端末とも日本語・英日混在入力、学習保存と別process再読込のinstrumentationが成功しています。GUI入力・候補確定はmoto g31のdarkとF-52Eのlightで確認済みです。Pixel 7のGUI確認は画面ロック解除待ちです。
+2026-10-11、[android-v0.1.0-alpha.1 のPre-release](https://github.com/hogehonya/fcitx5-meltype/releases/tag/android-v0.1.0-alpha.1)を最新のhost62 / plugin68へ差し替える準備をしています。公開済みファイルのrevisionはRelease本文と添付 `release-manifest.json` / `SHA256SUMS` を正本として確認してください。[導入・制限・対応ソース](docs/ANDROID-TRIAL.md)を案内しています。debug署名の試用版で、stable版ではありません。
 
-この節は2026-10-10に確認した可変の公開状況です。要求・要件・基本設計は文書PR #14でmainへ公開済みですが、Android実装はまだ既定ブランチへマージしていません。検証済みAPKを生成したコード入力はcore `87b1ae13` → plugin `14cbeaa` → host `a0cf7ed8`です。その後のplugin `41a79d4` / host `e264cffa`は文書・remote URL・gitlinkのみの更新で、APK実装は変わりません。2026-10-10 15:55 JST確認時点でcore head CI17件のうちUbuntu push core1件は成功（15:55:14）、残16件はWaiting/Blocked、aggregateはpendingです。Windows/macOSに適合するrunnerはありません。このため、[core PR #8](https://gitea.honya.dev/honya-dev-forks/meltype/pulls/8)、[plugin PR #11](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/11)、[host PR #11](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/11)は依存順にマージ保留です。
+最新版は入力中・確定後の予測候補、画面の「あ/ア」「英数」変換、未確定時Enterの確定専用処理、focus-out時の文字再投入防止を含みます。候補行を残し、半透明のaux凡例は表示しません。機能追加段階のF-52E（Android16/arm64）検証に加え、plugin68では隔離editorclear試験と許諾済みGUI送信後の欄消去を確認しました。他のnative回帰項目はplugin68での再実行待ちです。Pixel7・moto g31の旧版での実績を最新版の確認とは扱いません。Pixel7更新は未実施です。
 
-- [検証済みAndroid APKビルド手順](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/android/README.md): JDK 21、SDK 36、NDK 28.0.13004108、NativeAOT/Mozc入力とGradle引数。
-- [検証済み固定依存とNativeAOT生成](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/docs/BUILD.md)。既存dirty cloneを使わず独立checkoutでビルドします。
-- [実機結果・SHA256・制限](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/docs/TESTING.md)。16KB page端末と他のJSON保存用途は実機未確認です。
+共通core `444ce0d` と未mergeのAndroid実装が対応ソースの対象です。必要なCIは未完のため実装PRはmerge保留です（[core PR10](https://gitea.honya.dev/honya-dev-forks/meltype/pulls/10)、[plugin PR29](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/29)、[focus-out PR31](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/31)、[host PR17](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/17)、[境界テストPR19](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/19)）。公開はCI完了を意味しません。
 
-試用版の入手先・公開状態は[android-v0.1.0-alpha.1 のPre-releaseページ](https://github.com/hogehonya/fcitx5-meltype/releases/tag/android-v0.1.0-alpha.1)を参照してください。[導入・制限・対応ソースの案内](docs/ANDROID-TRIAL.md)に沿って、ライセンス付き導入ZIPのhost・pluginを組で導入します。stable版ではなくdebug署名です。上流Fcitx5 AndroidのRelease APKにこの統合が含まれるとは扱いません。元の検証済みAPKは作業ホストの `/home/honya/Downloads/Meltype-Android-20261010/` に保管しています。
+- 最新版のソース再現はRelease添付CorrespondingSourceの `SOURCE-README.md` と固定revision・ビルド入力を使います。GitHubの自動Source codeはAndroid実装を含みません。
+- 開発中の[Androidビルド手順](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/f5974122208e47a4c8f85b26f29acb200ba6aae5/android/README.md)と[検証記録](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/f5974122208e47a4c8f85b26f29acb200ba6aae5/docs/TESTING.md)は実装ブランチにあります。配布ファイルはmanifestの固定revisionを優先します。
+- [初版と最新版の実測・制限](docs/TESTING.md)。API24下限、16KB page端末、他のJSON保存用途、全focus/password/回転等は未確認です。
 
 ## 設計・検証
 
