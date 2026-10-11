@@ -26,7 +26,7 @@
 
 試用版の入手先・公開状態は[android-v0.1.0-alpha.1 のPre-releaseページ](https://github.com/hogehonya/fcitx5-meltype/releases/tag/android-v0.1.0-alpha.1)を参照してください。[導入・制限・対応ソースの案内](docs/ANDROID-TRIAL.md)に沿って、ライセンス付き導入ZIPのhost・pluginを組で導入します。stable版ではなくdebug署名です。上流Fcitx5 AndroidのRelease APKにこの統合が含まれるとは扱いません。元の検証済みAPKは作業ホストの `/home/honya/Downloads/Meltype-Android-20261010/` に保管しています。
 
-2026-10-11のFocusOut修正（[Issue #30](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/30) / [PR #31](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/31)）は製品source3134d2f、plugin68 APKを保存済み。F-52Eの同じ実JNI editorclear試験で旧plugin62は追加commitをFAIL再現、新plugin68はPASS。新Signal GUI・追加回帰・Pixelは未確認で、CI成功待ちのため未merge。成果物は作業ホスト `/home/honya/Downloads/Meltype-Android-Focusout-20261011/manifest.json`、検証の正本は[TESTING](docs/TESTING.md)。private会話/画像やユーザーデータ初期化を含みません。
+2026-10-11のFocusOut修正（[Issue #30](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/30) / [PR #31](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/31)）は製品source3134d2f、plugin68 APKを保存済み。F-52Eの同じ実JNI editorclear試験で旧plugin62は追加commitをFAIL再現、新plugin68はPASS。新plugin68のF-52E Signal 8.30.3 GUIは、許可済み合成文の未確定送信後に欄/候補が空となり、約20秒再投入なしを確認しPASS。追加回帰・Pixelは未確認、CI成功待ちのため未merge。成果物は作業ホスト `/home/honya/Downloads/Meltype-Android-Focusout-20261011/manifest.json`、検証の正本は[TESTING](docs/TESTING.md)。private会話/画像やユーザーデータ初期化を含みません。
 
 ## 設計・検証
 

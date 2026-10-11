@@ -194,3 +194,7 @@ FocusOut修正版plugin `0.1.3-68-g30d15019`（製品3134d2f、docs32ccffe、hos
 ### F-52E実JNI editorclear Red/Green
 
 host test source `0eb89388ebc453aecda81e1ae56ffd809c109c4e` / test71生成SUCCESS（50秒）・install成功。保持host62と旧plugin62ではeditorclearが1.521秒でFAIL、`expected 0 commits, was 1`を再現した。同じtestで新plugin68をinstall-r成功後、editorclearは1.822秒PASS。これは隔離editorからFcitx Instance/JNI FocusOut境界を通したRed/Greenであり、直接mock試験を補完する。新Signal GUI再受入と追加native回帰は未完。Pixel未実施、core CI pendingによるmerge保留を継続する。test APK/署名/SHAはFocusout manifestへ保存し、private画像・会話を保存しない。
+
+### F-52E Signal 8.30.3修正後GUI
+
+ユーザーの明示送信許可により、新plugin68で合成文「日本語のテストです」をSpace変換し、未確定下線・候補を確認した。アプリ送信ボタンを1回押すとoutgoing bubbleと送信完了チェックが表示され、入力欄・候補が空になった。約20秒後も再投入なし、GUI再受入PASS。private screenshot/相手情報/会話内容は保存しない。実JNI Red/Greenとは別の証拠として記録する。Pixelと追加native回帰は今回未確認、CI pending/noCIのためPR未mergeを保持する。

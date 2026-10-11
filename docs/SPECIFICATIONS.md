@@ -44,4 +44,4 @@ Settings/UserModel/LanguageMemory/TranslationDictionary等、変換履歴以外�
 
 ## S-13: FocusOutの確定責任（R-08）
 
-InputContextFocusOutはFcitx frameworkへ確定責任を委ねる。ClientUnfocusCommitありならclient、なしならframeworkがpreeditを確定するため、Meltypeのdeactivateはどちらも追加commitせずsession/panel/予測/ローマ字追跡を破棄する。通常reset、FocusOut以外のIME切替deactivate、明示Enter/候補tapは従来どおり。VR-13は両capabilityの一回確定と次入力新session、次語clear、通常reset/IME切替commit維持をaddon fixtureで確認し、実機Signalは別途受入する。
+InputContextFocusOutはFcitx frameworkへ確定責任を委ねる。ClientUnfocusCommitありならclient、なしならframeworkがpreeditを確定するため、Meltypeのdeactivateはどちらも追加commitせずsession/panel/予測/ローマ字追跡を破棄する。通常reset、FocusOut以外のIME切替deactivate、明示Enter/候補tapは従来どおり。VR-13は両capabilityの一回確定と次入力新session、次語clear、通常reset/IME切替commit維持をaddon fixtureで確認し、実JNI旧plugin Red/新plugin Green、F-52E Signal 8.30.3の未確定送信後empty・約20秒再投入なしを確認しPASS。Pixelは未確認。
