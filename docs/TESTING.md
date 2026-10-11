@@ -172,3 +172,9 @@ APKと最新試験source/hashはDownloads/Meltype-Android-Prediction-20261010/ma
 core4予測試験と全190件、managed native ABI build成功。日本語確定後候補/連続tap追加commit、文脈更新、新typing・空Backspaceで古い候補消去、F6/F7/F10明示確定抑制を検証。実Mozc固定archiveへ新bridgeを隔離compile/linkし、「東京」文脈の空queryで次語非空、反復20回free、prefix「にほ」/通常変換回帰に成功。desktop requestのみでは次語非空testがFAILし、空queryのみmixed_conversionを有効にしてPASS。新しいNativeAOT/APK、F-52E/Pixelの次語受入、GUIは未実施であり、上記prefix版受入と分ける。既存profileは使用せず、削除・初期化・学習形式変更をしていない。
 
 次語core `444ce0d6532aa727987e6409b010e91a3889786e` のAndroid NativeAOT生成成功。export10件/ELF16KB LOAD alignmentを確認、library SHA256 `b263a94729a2aa6a1ad8443dd9e74c8c0b27c0accdf532983fea850c16369747`。plugin source `4ca576d`、Android統合branch競合解消merge `8971b5d` は同一tree。最新headのcore CI17contextは取得時すべてpending、plugin status0。両Android統合branchは必須status checkなし（既存設定を変更していない）、PR 10/29はmerge可能だが次語実機受入まで未merge。辞書probeは東京→🗼、東京🗼→候補なしであり、全ての文脈で次語非空を保証しない。語彙と順序を固定せず、次語なしを正常として扱う。
+
+## 2026-10-11 次語統合版 F-52E native受入
+
+成果物host62/plugin62/test63（host build52e506a9、test54952f10、plugin製品4ca576d/core444ce0d）をUSBでinstall-r成功。Enter 3件0.321秒、nextword 1件2.282秒、prediction 1件1.568秒、toggle 1件2.113秒、english 1件1.479秒、reload 1件1.572秒がPASS。raw profile保護例外なし。normalは開始前のUSB切断でdevice not foundとなり未実施。旧製品のnormal成功を最新版normal成功としない。
+
+GUIの凡例非表示は未確認、Pixel 7はUSB未接続・無線操作の許諾未回答で最新版未導入/未受入。成果物と署名/全SHAはDownloads/Meltype-Android-Nextword-20261011/manifest.json。最新core head444ce0dのCI17contextは全pending、plugin head2155ba0にCIはない（status0）。CI成功確認要件を満たすまでPR 10/29は未merge、PR28のsuperseded closeも統合確認まで保留する。Android統合branchの必須status設定がないことをCI成功の代わりにしない。
