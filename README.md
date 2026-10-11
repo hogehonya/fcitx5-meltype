@@ -14,9 +14,9 @@
 
 ## AndroidのビルドとAPK入手
 
-2026-10-11、[android-v0.1.0-alpha.1 のPre-release](https://github.com/hogehonya/fcitx5-meltype/releases/tag/android-v0.1.0-alpha.1)を最新のhost62 / plugin68へ差し替える準備をしています。公開済みファイルのrevisionはRelease本文と添付 `release-manifest.json` / `SHA256SUMS` を正本として確認してください。[導入・制限・対応ソース](docs/ANDROID-TRIAL.md)を案内しています。debug署名の試用版で、stable版ではありません。
+2026-10-11、[android-v0.1.0-alpha.1 のPre-release](https://github.com/hogehonya/fcitx5-meltype/releases/tag/android-v0.1.0-alpha.1)を最新のhost62 / plugin68へ差し替えました。公開済みファイルのrevisionはRelease本文と添付 `release-manifest.json` / `SHA256SUMS` を正本として確認してください。[導入・制限・対応ソース](docs/ANDROID-TRIAL.md)を案内しています。debug署名の試用版で、stable版ではありません。
 
-最新版は入力中・確定後の予測候補、画面の「あ/ア」「英数」変換、未確定時Enterの確定専用処理、focus-out時の文字再投入防止を含みます。候補行を残し、半透明のaux凡例は表示しません。機能追加段階のF-52E（Android16/arm64）検証に加え、plugin68では隔離editorclear試験と許諾済みGUI送信後の欄消去を確認しました。他のnative回帰項目はplugin68での再実行待ちです。Pixel7・moto g31の旧版での実績を最新版の確認とは扱いません。Pixel7更新は未実施です。
+最新版は入力中・確定後の予測候補、画面の「あ/ア」「英数」変換、未確定時Enterの確定専用処理、focus-out時の文字再投入防止を含みます。候補行を残し、半透明のaux凡例は表示しません。機能追加段階のF-52E（Android16/arm64）検証に加え、plugin68では隔離editorclear試験と許諾済みGUI送信後の欄消去を確認しました。他のnative回帰項目はplugin68での再実行待ちです。Pixel7・moto g31の旧版での実績を最新版の確認とは扱いません。Pixel7（Android17）は無線許諾後にhost62/plugin68へ更新し、editorclear・Enter3件・次語の隔離試験が成功しました。GUIは画面ロック中で未確認、その他のnative回帰は未実行です。
 
 共通core `444ce0d` と未mergeのAndroid実装が対応ソースの対象です。必要なCIは未完のため実装PRはmerge保留です（[core PR10](https://gitea.honya.dev/honya-dev-forks/meltype/pulls/10)、[plugin PR29](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/29)、[focus-out PR31](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/31)、[host PR17](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/17)、[境界テストPR19](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/19)）。公開はCI完了を意味しません。
 
