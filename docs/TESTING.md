@@ -113,7 +113,7 @@ S-09/VR-09のLinux受入は、実provider/Fcitx InputContext integrationと異�
 
 ## 2026-10-11 alpha1差し替え準備の確認範囲
 
-ユーザーの「公開版の差し替えとリポジトリ更新」をIssue #32で追跡する。最新版はhost62/plugin68/core444ce0d。F-52E USBでEnter3件、次語、予測、あア/英数、直接英字、学習再読込の隔離instrumentationが成功した。通常phaseはUSB切断により未実施。focus-out境界は同一test71で旧plugin62 FAIL（1.521秒、commit expected0/actual1）→修正plugin68 PASS（1.822秒）。テストプロフィール全バイトの原状復帰を確認した。
+ユーザーの「公開版の差し替えとリポジトリ更新」をIssue #32で追跡する。最新版はhost62/plugin68/core444ce0d。機能追加段階のF-52E USBでEnter3件、次語、予測、あア/英数、直接英字、学習再読込の隔離instrumentationが成功した（旧plugin62等）。plugin68でこれら全項目の追加native回帰は未実施である。通常phaseはUSB切断により未実施。focus-out境界は同一test71で旧plugin62 FAIL（1.521秒、commit expected0/actual1）→修正plugin68 PASS（1.822秒）。テストプロフィール全バイトの原状復帰を確認した。
 
 親は明示された送信許諾の下で合成文をGUI検証し、Space変換後Enter1回は確定だけ、次Enterはeditor設定に従った改行を確認した。修正plugin68では未確定下線のある合成文を送信ボタンで送信し、入力欄・候補が空、20秒後も再投入なしを確認した。個人の会話、相手名、private画像は収録しない。隔離JNI試験と当該アプリGUIの証拠を分け、通知順序の完全再現や他アプリの網羅検証とは扱わない。
 
