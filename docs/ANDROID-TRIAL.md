@@ -13,7 +13,18 @@
 
 既存のATOK/Gboard等を削除する必要はありません。本体はdebug packageのため公式Fcitx5とは共存できます。別のFcitx5 Debugが既にあり署名が違う場合は更新できません。データを消して解決せず、元の環境を保持して導入を止めてください。試用をやめるときはAndroidのキーボード切替で元のIMEへ戻せます。
 
-## 試用版の範囲
+## 更新版の機能と確認範囲
+
+2026-10-11、host62 / plugin68への差し替えを準備しています。差し替え完了前は旧host25 / plugin28が公開されている場合があります。取得時にRelease本文・manifest・SHA256SUMSを確認してください。
+
+- 入力中の予測候補と、確定後に辞書が候補を返す文脈での次語予測を表示します。候補がない文脈では表示しません。
+- 「あ/ア」は未確定文字をかな/カナへ切り替え、「英数」は半角英数へ変換します。恒久的な入力モードや12キーかな配列ではありません。空入力で変換キーはアプリへ送られません。
+- 未確定時の画面Enterは確定だけを行い、空入力時はeditorの送信・完了・改行設定に従います。focus-outでクライアント消去済みの文字を独自に再確定しません。
+- 半透明aux凡例を除去し、予測/変換候補行を保持します。
+- 最新版はF-52E Android16/arm64でEnter、次語、予測、あア/英数、直接英字、学習再読込のinstrumentationを確認。通常phase全体はUSB切断により未実施です。GUIは許諾下の合成文でEnter確定と送信後消去・20秒間再投入なしを確認しました。
+- Pixel7の最新版更新・GUI確認は未実施。以下の3台の実績は初版の記録であり最新版へ引き継いだ検証とは扱いません。
+
+## 初版の実測と共通制限
 
 stable版ではありません。両APKは同じdebug署名で、正式版と署名互換を保証しません。APKそのものは実機検証したファイルから変更していません。
 
@@ -21,13 +32,13 @@ stable版ではありません。両APKは同じdebug署名で、正式版と署
 - moto g31 Android12、F-52E Android16、Pixel7 Android17で日本語・英日混在入力、学習保存と別process再読込のinstrumentationが成功。
 - GUIキー入力・Space候補・選択/Enter確定はmoto g31 darkとF-52E lightで確認。Pixel7 GUI、API24下限端末、16KB page端末は未確認。
 - 変換履歴以外のNativeAOT JSON保存、全focus/password/回転等の網羅試験は未完。Mozc固有学習callbackは未対応です。
-- 2026-10-10時点でCIは未完、Android実装3PRは未merge。[core PR8](https://gitea.honya.dev/honya-dev-forks/meltype/pulls/8) / [plugin PR11](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/11) / [host PR11](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/11)。試用版公開はCI完了・stable化を意味しません。
+- 2026-10-11時点でも必要なCIは未完、Android実装は既定mainへ未merge。[core PR8](https://gitea.honya.dev/honya-dev-forks/meltype/pulls/8) / [plugin PR11](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/11) / [host PR11](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/11)。試用版公開はCI完了・stable化を意味しません。
 
 確認範囲と過去の実測は[TESTING](TESTING.md)、要求・要件・設計は[文書一覧](README.md)を参照してください。問題は端末/Android版・操作・期待結果を添えて[Issue](https://github.com/hogehonya/fcitx5-meltype/issues)へ報告できます。個人の入力文や学習ファイルを公開する必要はありません。
 
 ## ソース・SHA256・ライセンス
 
-同じPre-releaseに `meltype-android-v0.1.0-alpha.1-corresponding-source.tar.xz`、`release-manifest.json`、`SHA256SUMS` を添付します。対応ソースはcore `87b1ae13`、plugin `14cbeaa`、host `a0cf7ed8`で、必要な公開依存の固定参照・取得手順、ライセンス全文、ビルド入力も含みます。展開後の `SOURCE-README.md` と `bootstrap-sources.py` が入口です。
+同じPre-releaseに `meltype-android-v0.1.0-alpha.1-corresponding-source.tar.xz`、`release-manifest.json`、`SHA256SUMS` を添付します。初版の対応ソースはcore `87b1ae13`、plugin `14cbeaa`、host `a0cf7ed8`でした。差し替え版はcore `444ce0d6532aa727987e6409b010e91a3889786e`、plugin `f5974122208e47a4c8f85b26f29acb200ba6aae5`（APK製品ソース `3134d2f91096a10f62b2e571f827f7ebd47230c3` との差は文書のみ）、host `52e506a9775eba9d9c936afd4eb257c8b4662f23` をmanifestへ記録し、必要な公開依存の固定参照・取得手順、ライセンス全文、ビルド入力も含みます。展開後の `SOURCE-README.md` と `bootstrap-sources.py` が入口です。
 
 **GitHubが自動生成する「Source code (zip/tar.gz)」はタグ位置の文書mainで、未mergeのAndroid実装は含みません。APK対応ソースは上記の添付CorrespondingSourceを使ってください。** 署名秘密鍵は配布しません。ソースから生成したAPKの署名とversion metadataは配布APKと異なることがあります。
 

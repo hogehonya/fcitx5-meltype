@@ -110,3 +110,11 @@ S-09/VR-09のLinux受入は、実provider/Fcitx InputContext integrationと異�
 ## Linux 英字直接入力の検証（Issue #20）
 
 2026-10-10、Linux配布v1.0.0 provider/helper、Fcitx5 5.1.12、G++14.2.0を同じ固定入力として使用。新受入testを旧engineへ適用すると `Muhenkan consumed` でintegration失敗（Red）、実装後はctest 2/2成功。直接キーpass-through、通常Meltype復帰、context独立、pending/候補の一回commit、release/修飾キー保持、mode表示/解除後保持を検証した。`addon/README.md`のcmake/ctest手順を利用し、HOME/Mozc profileは `/home/honya/tmp/fcitx5-english-mode/green-home` に隔離した。GUI検証は別途Issue #20へ記録し、ここで実行済みとは扱わない。既存Android APK・対応ソースassetは変更しない。
+
+## 2026-10-11 alpha1差し替え準備の確認範囲
+
+ユーザーの「公開版の差し替えとリポジトリ更新」をIssue #32で追跡する。最新版はhost62/plugin68/core444ce0d。F-52E USBでEnter3件、次語、予測、あア/英数、直接英字、学習再読込の隔離instrumentationが成功した。通常phaseはUSB切断により未実施。focus-out境界は同一test71で旧plugin62 FAIL（1.521秒、commit expected0/actual1）→修正plugin68 PASS（1.822秒）。テストプロフィール全バイトの原状復帰を確認した。
+
+親は明示された送信許諾の下で合成文をGUI検証し、Space変換後Enter1回は確定だけ、次Enterはeditor設定に従った改行を確認した。修正plugin68では未確定下線のある合成文を送信ボタンで送信し、入力欄・候補が空、20秒後も再投入なしを確認した。個人の会話、相手名、private画像は収録しない。隔離JNI試験と当該アプリGUIの証拠を分け、通知順序の完全再現や他アプリの網羅検証とは扱わない。
+
+最新版のPixel7更新は未実施。初版の3台検証は過去記録として保持する。API24下限/16KB page/他JSON用途/全focus等は未確認。core等の必要CIは未完で実装PRは未merge、app lintは既存269 errors/49 warningsで失敗し変更対象指摘0件。公開差し替え前後の正本はReleaseのmanifest/SHA256SUMSであり、この記録は公開完了を主張しない。
