@@ -186,3 +186,7 @@ GUIの凡例非表示は未確認、Pixel 7はUSB未接続・無線操作の許�
 ## FocusOut送信後の再commit（Issue #30）
 
 source3134d2f。旧engineへ追加addon境界fixtureを適用すると、clientが送信済みと想定したpreeditをdeactivate(FocusOut)で再commitし、`FocusOut must not recommit already submitted preedit`でFAIL（Red）。最小修正後はClientUnfocusCommit有無両方で追加commitなし、session破棄/次入力再生成、空次語候補clear、通常reset/IME切替commit保持がPASS（Green）。これはengine呼出しのmock境界試験であり、Fcitx Instance/JNI実イベントはhost editorclear受入で別確認する。Linux addon全target build・failure ctest・Python30件成功。実core integration/Android plugin build/F52Signal再受入は後続結果を記録し、現時点では未実施。
+
+FocusOut修正版plugin `0.1.3-68-g30d15019`（製品3134d2f、docs32ccffe、host metadata30d15019）のassembleDebug成功。正規check-plugin-apkでarm64-only/ELF16KB/loader/config検査PASS、apksigner検証PASS、APK内core SHAは固定444ce0dのAOT `b263a94729a2aa6a1ad8443dd9e74c8c0b27c0accdf532983fea850c16369747`と一致。plugin APK SHA `b49cda15de3d4f444d620dc765497daa80d3bdffde3484e7c0ef432189cfaa38`、host62は保持。Downloads/Meltype-Android-Focusout-20261011/manifest.jsonへ記録。
+
+同一invocationのassembleDebug+lintDebugではgenerateDataDescriptor→generateDebugLintReportModelのGradle implicit dependency検証がFAILしたが、native compile/APK生成は成功。既存正規のstandalone lintDebug再実行は46秒SUCCESS（root17385）、ゲート無効化なし。端末Red/Green、Signal GUI再受入はまだ未実施として分離する。
