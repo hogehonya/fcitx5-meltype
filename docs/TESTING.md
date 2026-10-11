@@ -111,10 +111,12 @@ S-09/VR-09のLinux受入は、実provider/Fcitx InputContext integrationと異�
 
 2026-10-10、Linux配布v1.0.0 provider/helper、Fcitx5 5.1.12、G++14.2.0を同じ固定入力として使用。新受入testを旧engineへ適用すると `Muhenkan consumed` でintegration失敗（Red）、実装後はctest 2/2成功。直接キーpass-through、通常Meltype復帰、context独立、pending/候補の一回commit、release/修飾キー保持、mode表示/解除後保持を検証した。`addon/README.md`のcmake/ctest手順を利用し、HOME/Mozc profileは `/home/honya/tmp/fcitx5-english-mode/green-home` に隔離した。GUI検証は別途Issue #20へ記録し、ここで実行済みとは扱わない。既存Android APK・対応ソースassetは変更しない。
 
-## 2026-10-11 alpha1差し替え準備の確認範囲
+## 2026-10-11 alpha1差し替え公開の確認範囲
 
 ユーザーの「公開版の差し替えとリポジトリ更新」をIssue #32で追跡する。最新版はhost62/plugin68/core444ce0d。機能追加段階のF-52E USBでEnter3件、次語、予測、あア/英数、直接英字、学習再読込の隔離instrumentationが成功した（旧plugin62等）。plugin68でこれら全項目の追加native回帰は未実施である。通常phaseはUSB切断により未実施。focus-out境界は同一test71で旧plugin62 FAIL（1.521秒、commit expected0/actual1）→修正plugin68 PASS（1.822秒）。テストプロフィール全バイトの原状復帰を確認した。
 
 親は明示された送信許諾の下で合成文をGUI検証し、Space変換後Enter1回は確定だけ、次Enterはeditor設定に従った改行を確認した。修正plugin68では未確定下線のある合成文を送信ボタンで送信し、入力欄・候補が空、20秒後も再投入なしを確認した。個人の会話、相手名、private画像は収録しない。隔離JNI試験と当該アプリGUIの証拠を分け、通知順序の完全再現や他アプリの網羅検証とは扱わない。
 
-最新版のPixel7更新は未実施。初版の3台検証は過去記録として保持する。API24下限/16KB page/他JSON用途/全focus等は未確認。core等の必要CIは未完で実装PRは未merge、app lintは既存269 errors/49 warningsで失敗し変更対象指摘0件。公開差し替え前後の正本はReleaseのmanifest/SHA256SUMSであり、この記録は公開完了を主張しない。
+Pixel7 Android17はユーザーの無線更新許諾後、host62/plugin68/test71のinstall-rが各成功。editorclear 1件PASS（1.599秒）、EditorReturnActionTest 3件PASS（0.218秒）、nextword 1件PASS（1.74秒）。プロフィール全バイトは試験前後同一、Fcitx/Meltype選択を維持した。GUIはkeyguard/Dozingのため未確認でロックを越える操作は行わず、他のnative回帰は未実行。個人プロフィール、端末serial、private画像は収録しない。初版の3台検証は過去記録として保持する。API24下限/16KB page/他JSON用途/全focus等は未確認。core等の必要CIは未完で実装PRは未merge、app lintは既存269 errors/49 warningsで失敗し変更対象指摘0件。alpha1差し替え公開後に4assetを再取得し配布前原本との完全一致、SHA256SUMSとZIP内2APKのhash一致を確認した。正本はReleaseのmanifest/SHA256SUMSである。既存tag位置はa77a324のまま、Pre-releaseを維持し、対応ソースは添付archiveを使う。
+
+公開4assetは公開時点の固定記録として維持し、後続のPixel検証はRelease本文とこの文書に追記する。配布ソース・APKは変更していない。
