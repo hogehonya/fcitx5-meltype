@@ -38,3 +38,7 @@ Android実装は実装ブランチを対象とし、既存main公開PR core #8 /
 ## Android英字モード反映（Issue #22）
 
 2026-10-10本会話でユーザーがLinux英字mode完成後「反映させて」とAndroidへの反映・実機更新を要求。Linux PR21の共有engineを取り込み、画面用のMeltype専用ABC/かな操作と物理無変換/変換mappingを接続する（画面操作はAgent採用案）。既存LanguageKey/数字記号面ABC layout切替は維持。公開試用版assetは変更せず、今回buildしたAPKをUSB指定端末へ更新して別に検証する。
+
+## 送信後のFocusOut（R-08、Issue #30）
+
+2026-10-11 ユーザー「それで試して実装してテストしよう」。F-52E Signal 8.30.3で未確定合成文をSpace変換後にアプリ送信すると同文が欄へ戻る。ATOK同手順は欄が空（root観測）。FocusOutの独自再commitを止める案を採用し、[Issue #30](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/30)で追跡する。通常reset・IME切替・明示確定を保持し、端末再受入で効果を確認する。

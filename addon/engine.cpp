@@ -207,7 +207,14 @@ void Engine::reset(const fcitx::InputMethodEntry &,fcitx::InputContextEvent &eve
         else clear(ic);
     } catch(const std::exception &) { FCITX_ERROR() << "Meltype reset failed"; recover(ic,state); }
 }
-void Engine::deactivate(const fcitx::InputMethodEntry &entry,fcitx::InputContextEvent &event) { reset(entry,event); }
+void Engine::deactivate(const fcitx::InputMethodEntry &entry,fcitx::InputContextEvent &event) {
+    if(event.type()!=fcitx::EventType::InputContextFocusOut) { reset(entry,event); return; }
+    // Fcitx already commits client preedit, unless ClientUnfocusCommit delegates
+    // it to the client. Never submit that same text again on focus loss.
+    auto *ic=event.inputContext();
+    try { recover(ic,ic->propertyFor(&factory_)); }
+    catch(const std::exception &) { clear(ic); }
+}
 void Engine::select(fcitx::InputContext *ic,int index) {
     State *state=nullptr;
     try {

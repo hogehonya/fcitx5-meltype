@@ -41,3 +41,7 @@ Settings/UserModel/LanguageMemory/TranslationDictionary等、変換履歴以外�
 ### S-10 / VR-10: Android英字直接入力（Issue #22）
 
 [Android反映要求](REQUIREMENTS.md#android英字モード反映issue-22)に対応する。S-09英字状態のshared engineをAndroidにも適用し、hostはMeltype選択時だけABC/かなキーを表示して無変換/変換symを送る。物理Androidキーcodeも対応symへ変換する。既存LanguageKey/数字記号ABCを維持。VR-10は `MeltypeTest -e phase english` のpendingcommit・Virtual文字とSpace完全一致・Meltype/A保持・復帰日本語/あ・物理mapping、および画面キー表示/タップ確認。通常/reloadを回帰し、実行結果はTESTING/Issue #22へ記録する。
+
+## S-13: FocusOutの確定責任（R-08）
+
+InputContextFocusOutはFcitx frameworkへ確定責任を委ねる。ClientUnfocusCommitありならclient、なしならframeworkがpreeditを確定するため、Meltypeのdeactivateはどちらも追加commitせずsession/panel/予測/ローマ字追跡を破棄する。通常reset、FocusOut以外のIME切替deactivate、明示Enter/候補tapは従来どおり。VR-13は両capabilityの一回確定と次入力新session、次語clear、通常reset/IME切替commit維持をaddon fixtureで確認し、実機Signalは別途受入する。
