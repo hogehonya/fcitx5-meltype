@@ -141,7 +141,7 @@ plugin source `3353260`、固定core `87b1ae13e95144266f9e69d8b20d42f00aa0e26e`�
 
 ## 入力途中の予測（Issue #27）
 
-core予測3件と全189件、Native ABI managed build、plugin Python30件が成功。純日本語入力途中候補、tap即確定、未完ローマ字抑制、Backspace再表示、通常Space変換、provider失敗/英数を検証。新bridge sourceを隔離/tmp objectへcompileし、既存の固定Mozc archivesとlinkした実engine試験で「にほ」→「日本」包含、NULL/空入力、反復20回の予測freeと通常変換回帰が成功。上流deprecated警告、空の隔離profileに対する未作成辞書/historyログを記録。新artifact・APK GUIは統合担当が別途検証し、core/bridge成功を代用しない。上行削除は意図確認まで保留。
+core予測3件と全189件、Native ABI managed build、plugin Python30件が成功。純日本語入力途中候補、tap即確定、未完ローマ字抑制、Backspace再表示、通常Space変換、provider失敗/英数を検証。新bridge sourceを隔離/tmp objectへcompileし、既存の固定Mozc archivesとlinkした実engine試験で「にほ」→「日本」包含、NULL/空入力、反復20回の予測freeと通常変換回帰が成功。上流deprecated警告、空の隔離profileに対する未作成辞書/historyログを記録。新artifact・APK GUIは統合担当が別途検証し、core/bridge成功を代用しない。当時は上行の意図確認待ちだったが、2026-10-11の指定によりAndroid操作説明hintだけを非表示にする。
 
 ## かな・カナの一回変換（Issue #24）
 
@@ -156,3 +156,13 @@ core予測3件と全189件、Native ABI managed build、plugin Python30件が成
 Linux実NativeAOT配布v1.0.0/helperによる2回F10確定→次nihongoのintegrationは旧engineでFAILを再現（Red）。修正後integrationと異常回復2/2 PASS（1.04秒）。初回F10一回だけではRedを再現しなかったため、実機の二回確定と一致させた。Android core87/providerは変更せずpluginのみ再生成する。Pixel修正版受入は未実行でIssue #26へ追記する。
 
 F10取消の独立レビュー指摘を修正：Escape/全Backspaceで未確定文字列が空になった場合は追跡フラグのみ解除し、sessionと通常入力文脈は保持する。両取消ケースで確定なし、その後の通常英語入力文脈がF10を使わない基準ICと一致することを実coreで確認。integration/異常回復2/2 PASS（1.37秒）。
+
+## 2026-10-11 予測対応版のF-52E USB受入
+
+製品sourceはcore353995a / plugin64009ff / host047277e6。製品host49/plugin49を保持し、試験だけhost1e0295f9のtest52へ更新した。predictionは1.626秒、通常test51は1.908秒、reload test51は1.14秒、english test49は1.233秒、toggle test49は2.257秒ですべてPASS。予測「にほ」→「日本」包含・候補tap全文確定、未完h追加で候補消去・Backspaceで復帰、Space文節選択→全文commit、F6/F7予測抑制、学習の別process再読込、F10後通常復帰を検証した。
+
+旧試験のFAILは、かな1文字削除へ「にh」を期待した操作不整合、先行予測イベントをSpace候補と誤取得したqueue使用、文節候補「に」と全文commit「に歩」を同一視した期待に分離し、host04de6f95/6feb48d2/1e0295f9で試験を修正した。製品の削除・文節確定動作は変更していない。今回GUIはSignal/ATOK画面を保護し未操作。Pixel 7の今回版更新/受入は継続中で、過去版成功を今回版へ流用しない。
+
+core353995a headのCIは17context: Ubuntu core push/PRとchanges/repro/accuracyは成功、Linux appとCLAは失敗、Windows/macOS等はpending。統合branch honya/android-aot-learningはprotected=false / enable_status_check=false / contexts=[]。plugin64009ffはstatus0で、honya/android-pluginも必須status checkなし。必須ゲートの解除は行わず、native受入と残CIを分ける。既存main公開PR #8/#11は今回のAndroid統合と別。plugin lint成功、host lintは既存269error/49warning（前回同数、今回変更指摘0）。
+
+APKと最新試験source/hashはDownloads/Meltype-Android-Prediction-20261010/manifest.jsonへ記録。2026-10-11に上行がAndroid操作説明hintと確定し、今回非表示へ変更。凡例非表示の新plugin受入は別途確認。次語予測は意図確認中。host Enter不具合（host #16）は別作業であり、この予測受入成功に含めない。

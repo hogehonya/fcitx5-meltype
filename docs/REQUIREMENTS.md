@@ -2,7 +2,7 @@
 
 ## 目的と資料
 
-Meltypeの英日混在入力をFcitx5で使用し、Android端末でも入力・候補確定・学習を利用できるようにする。正本としてREADME、既存ARCHITECTURE/BUILD/TESTING、検証済みplugin `14cbeaa`、host `a0cf7ed8`、core `87b1ae13`を参照した。対象はLinux addonとAndroid pluginであり、Windows/Mac/IBus全体の再設計は含めない。
+Meltypeの英日混在入力をFcitx5で使用し、Android端末でも入力・候補確定・学習を利用できるようにする。正本としてREADME、既存ARCHITECTURE/BUILD/TESTING、初期実装と、予測対応plugin `64009ff`、製品host `047277e6`、core `353995a`（試験修正host `1e0295f9`）を参照した。対象はLinux addonとAndroid pluginであり、Windows/Mac/IBus全体の再設計は含めない。
 
 ## ユーザー要求
 
@@ -16,11 +16,14 @@ Meltypeの英日混在入力をFcitx5で使用し、Android端末でも入力・
 |R-04|Gitea plugin名称をfcitx5-meltypeへ統一し公開先・ビルド・APK入手先を整理する|ユーザー。2026-10-10本会話/[#13](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/13)|3repoの入口を明確にし、未公開APKや未mergeを正確に案内する|
 |R-05|要求定義・要件定義・基本設計・フローその他の図をrepoへ置く|ユーザー。2026-10-10本会話/[#13](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/13)追記|要求から実装と検証を追跡できるようにする。既存設計文書を更新し重複しない|
 
+|R-06|入力途中の予測変換を追加する|ユーザー。2026-10-10「予測変換も追加してほしいな、予測変換がでたら上一行はいらないかも」、[core #9](https://gitea.honya.dev/honya-dev-forks/meltype/issues/9) / [plugin #27](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/27)|候補tap即確定はAgent採用案。2026-10-11に「半透明の凡例」「space 確定＋空白」と特定され、Android操作説明hintだけを非表示とする。2026-10-11「pixel7も修正を」「ドキュメント更新も」で追加端末・正本更新を継続。「POBOXみたいな予測変換」は入力途中の横候補/tap確定へ対応。次語予測は意図確認中|
+|R-07|未確定全文をかな・カナ・英数へ一回変換する|ユーザー。2026-10-10 [かな/カナ #24](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/24) / [英数 #26](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/26)|F6/F7/F10を使用する。永続直接英字モードとは区別し、次compositionへ英数変換を持ち越さない|
+
 ## 実装判断・提案・未決
 
 NativeAOT、arm64-v8a先行、Androidのin-process MozcはAgentによる実装判断として採用・検証した。ユーザーの初期要求そのものと混同しない。Gboard/ATOKの完全な複製、12キー/フリックの採用、他ABI対応、GitHub APK Release公開は確定要求に含めない。
 
-Android実装は検証済みブランチにあり、mainへ未merge。2026-10-10 15:55 JSTのcore head CIは17件中Ubuntu push core1件成功、残16件Waiting/Blocked・aggregate pending（Windows/macOS適合runner無し）であり、CI完了までの待機は残作業で、実機成功をCI成功へ置き換えない。Pixel 7のGUI確認は端末解除待ち。[現状と検証](TESTING.md)を参照する。
+Android実装は実装ブランチを対象とし、既存main公開PR core #8 / plugin #11は未merge。2026-10-11のF-52E USB native受入は予測・通常変換・学習再読込・英字・かな英数切替が成功。Pixel 7の今回版更新・予測受入は継続中。F-52Eの画面はユーザーのSignal/ATOKを保護するため操作せず、今回GUIは未確認。CIや公開とは分けて[現状と検証](TESTING.md)に記録する。
 
 [要件と受入対応](SPECIFICATIONS.md) / [基本設計](ARCHITECTURE.md) / [文書一覧](README.md)
 

@@ -126,7 +126,9 @@ bool Engine::apply(fcitx::InputContext *ic,const nlohmann::json &value) {
         fcitx::Text preedit(text,fcitx::TextFormatFlag::Underline);
         preedit.setCursor(text.size()); panel.setClientPreedit(preedit);
         state->preedit=!text.empty();
+#ifndef __ANDROID__
         panel.setAuxUp(fcitx::Text(view.at("hint").get<std::string>()));
+#endif
         auto candidates=view.at("candidates").get<std::vector<std::string>>();
         const bool converting=view.at("converting").get<bool>();
         if((converting && candidates.size()>1) || (!converting && !candidates.empty())) {

@@ -1,6 +1,6 @@
 # 要件定義
 
-[要求定義](REQUIREMENTS.md)を、実装で判定できる条件へ分解する。S-01/S-08とNFは共通の責務・文書・制約、S-02〜07/S-10はAndroid、S-09はLinux addonの仕様です。Androidは検証済み実装ブランチを対象とし、mainへ全コードが反映済みという意味ではありません。実測と未確認範囲の正本は[TESTING](TESTING.md)、固定ビルド入力の正本は[BUILD](BUILD.md)。
+[要求定義](REQUIREMENTS.md)を、実装で判定できる条件へ分解する。S-01/S-08とNFは共通の責務・文書・制約、S-02〜07/S-10〜12はAndroid、S-09はLinux addonの仕様です。Androidは検証済み実装ブランチを対象とし、mainへ全コードが反映済みという意味ではありません。実測と未確認範囲の正本は[TESTING](TESTING.md)、固定ビルド入力の正本は[BUILD](BUILD.md)。
 
 ## 機能要件と受入
 
@@ -15,6 +15,9 @@
 |S-07|R-01/R-02|固定core/NDK/ABIでNativeAOTを生成し、host/plugin/test APKを生成する。共有ライブラリ依存を解決し端末でaddonをロードできる|VR-07: build、APK checker、Python30件、bridge engine、core186件成功。16KB ELF alignment確認、16KB端末未確認|
 |S-08|R-04/R-05|READMEから要求・要件・設計・ビルド・検証へ辿れる。公開先・APK配布・merge/CIの現状を証拠と確認日付きで案内し、未公開・未確認を成功扱いしない|VR-08: 文書diff・リンク・独立reviewで確認。可変の進捗は[公開状況](../README.md#androidのビルドとapk入手)を参照|
 |S-09|R-01|LinuxでFcitx addonから既存NativeAOT providerと外部Mozc helperへ接続し、混在入力・候補選択・commitを提供する。Android保存先APIをLinux配布ABIへ無条件要求しない|VR-09: Linux実provider/InputContext integrationと異常回復の既存2tests、隔離GTKでkyouhagithubnipushshita→今日はgithubにpushしたを完全一致確認。[Linux記録と回帰条件](TESTING.md#linux-addon-の実行済み検証)|
+
+|S-11|R-06|任意予測providerを登録した日本語Auto編集中のみ最大20候補を表示する。予測tapで全文即確定し、通常Space変換は文節選択後Enterで全文確定する。英語・混在・未完ローマ字・明示かな表示は予測を出さず、provider失敗は通常入力を続ける。Android操作説明auxUp hintを出さず、候補とキーを維持する。Linux hintは維持する|VR-11: core予測3件、実Mozc prefix試験、MeltypeTest prediction。F-52E USB test52成功。GUI/Pixelの今回版受入は別途確認|
+|S-12|R-07|F6/F7で未確定全文をかな/カナへ、F10で英数へ一回変換する。F10確定後は次compositionを新sessionで通常へ戻し、取消では追跡だけを解除して入力文脈を保持する|VR-12: F-52E toggle test49成功（2.257秒）、F6/F7予測抑制はprediction test52成功。Linux F10/取消試験も成功。Pixel最新受入は継続中|
 
 ## 非機能要件
 
