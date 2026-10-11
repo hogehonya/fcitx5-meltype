@@ -16,7 +16,7 @@
 |S-08|R-04/R-05|READMEから要求・要件・設計・ビルド・検証へ辿れる。公開先・APK配布・merge/CIの現状を証拠と確認日付きで案内し、未公開・未確認を成功扱いしない|VR-08: 文書diff・リンク・独立reviewで確認。可変の進捗は[公開状況](../README.md#androidのビルドとapk入手)を参照|
 |S-09|R-01|LinuxでFcitx addonから既存NativeAOT providerと外部Mozc helperへ接続し、混在入力・候補選択・commitを提供する。Android保存先APIをLinux配布ABIへ無条件要求しない|VR-09: Linux実provider/InputContext integrationと異常回復の既存2tests、隔離GTKでkyouhagithubnipushshita→今日はgithubにpushしたを完全一致確認。[Linux記録と回帰条件](TESTING.md#linux-addon-の実行済み検証)|
 
-|S-11|R-06|任意予測providerを登録した日本語Auto編集中と通常日本語確定後に最大20候補を表示する。入力途中の予測tapで全文即確定し、次語tapは選択文字列を追加確定する。次語候補は更新文脈で継続し、新打鍵・空状態Backspace・フォーカス変更で消す。F6/F7/F10の明示変換確定や英数確定後は次語を表示しない。通常Space変換は文節選択後Enterで全文確定する。英語・混在・未完ローマ字・明示かな表示は予測を出さず、provider失敗は通常入力を続ける。Android操作説明auxUp hintを出さず、候補とキーを維持する。Linux hintは維持する|VR-11: prefix版F-52E USB test52成功。次語版はcore予測4件/全190件・実Mozc zero-query試験成功、APK実機受入待ち。GUI/Pixelの今回版受入は別途確認|
+|S-11|R-06|任意予測providerを登録した日本語Auto編集中と通常日本語確定後に最大20候補を表示する。入力途中の予測tapで全文即確定し、次語tapは選択文字列を追加確定する。次語候補は更新文脈で継続し、新打鍵・空状態Backspace・フォーカス変更で消す。F6/F7/F10の明示変換確定や英数確定後は次語を表示しない。通常Space変換は文節選択後Enterで全文確定する。英語・混在・未完ローマ字・明示かな表示は予測を出さず、provider失敗は通常入力を続ける。Android操作説明auxUp hintを出さず、候補とキーを維持する。Linux hintは維持する|VR-11: prefix版F-52E USB test52成功。次語版はcore予測4件/全190件・実Mozc zero-query試験成功、F-52E host62/plugin62/test63次語/予測受入成功。normal最新版未実施、CI成功待ち。GUI/Pixelの今回版受入は別途確認|
 |S-12|R-07|F6/F7で未確定全文をかな/カナへ、F10で英数へ一回変換する。F10確定後は次compositionを新sessionで通常へ戻し、取消では追跡だけを解除して入力文脈を保持する|VR-12: F-52E toggle test49成功（2.257秒）、F6/F7予測抑制はprediction test52成功。Linux F10/取消試験も成功。Pixel最新受入は継続中|
 
 ## 非機能要件
