@@ -170,3 +170,5 @@ APKと最新試験source/hashはDownloads/Meltype-Android-Prediction-20261010/ma
 ## 確定後の次語予測（Issue #27、2026-10-11追加要求）
 
 core4予測試験と全190件、managed native ABI build成功。日本語確定後候補/連続tap追加commit、文脈更新、新typing・空Backspaceで古い候補消去、F6/F7/F10明示確定抑制を検証。実Mozc固定archiveへ新bridgeを隔離compile/linkし、「東京」文脈の空queryで次語非空、反復20回free、prefix「にほ」/通常変換回帰に成功。desktop requestのみでは次語非空testがFAILし、空queryのみmixed_conversionを有効にしてPASS。新しいNativeAOT/APK、F-52E/Pixelの次語受入、GUIは未実施であり、上記prefix版受入と分ける。既存profileは使用せず、削除・初期化・学習形式変更をしていない。
+
+次語core `444ce0d6532aa727987e6409b010e91a3889786e` のAndroid NativeAOT生成成功。export10件/ELF16KB LOAD alignmentを確認、library SHA256 `b263a94729a2aa6a1ad8443dd9e74c8c0b27c0accdf532983fea850c16369747`。plugin source `4ca576d`、Android統合branch競合解消merge `8971b5d` は同一tree。最新headのcore CI17contextは取得時すべてpending、plugin status0。両Android統合branchは必須status checkなし（既存設定を変更していない）、PR 10/29はmerge可能だが次語実機受入まで未merge。辞書probeは東京→🗼、東京🗼→候補なしであり、全ての文脈で次語非空を保証しない。語彙と順序を固定せず、次語なしを正常として扱う。
