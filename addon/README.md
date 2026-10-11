@@ -1,7 +1,7 @@
 # Meltype Fcitx5 addon
 
 [Issue #6](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/6) の Linux 最小プラグインです。`engine.cpp`、`session.h`、`meltype_abi.h` は Android でも共有する入力・ABI 部分、`factory.cpp` は Linux の Mozc helper 初期化です。
-Android の in-process Mozc bridge、factory、host登録、APKは[検証済み未mergeブランチ](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/android/README.md)に実装済みです。このmainにはまだ含まれません。この CMake 入口は Android を受け付けず、未完成の APK 成功を装いません。
+Android の in-process Mozc bridge、factory、host登録、APKのビルド手順は[Android手順](../android/README.md)を参照してください。この CMake 入口はLinux addon用です。
 
 ## Linux build
 
