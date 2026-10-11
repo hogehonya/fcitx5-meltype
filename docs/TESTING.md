@@ -182,3 +182,7 @@ GUIの凡例非表示は未確認、Pixel 7はUSB未接続・無線操作の許�
 ## F-52E GUI確認（current、2026-10-11）
 
 ユーザーから合成テスト文の送信を明示許可されたSignal editorで、ソフトキーによる「日本語のテストです」の読み入力→Space変換→下線付きpreeditを確認した。1回目のEnterで下線が消えて確定し、送信されなかった。2回目のEnterはこのeditor設定では改行となった。許可済みの送信ボタンで合成文を送信し、outgoing bubbleを確認。候補行が表示され、半透明aux操作説明凡例がないことも確認した。これはcurrentの観測結果であり、他editor設定やPixelでの確認を代用しない。private screenshot、相手名、会話内容はrepo/成果物へ保存しない。Pixel、最新版normal未実施、CI pending/noCIによるmerge保留は継続する。
+
+## FocusOut送信後の再commit（Issue #30）
+
+source3134d2f。旧engineへ追加addon境界fixtureを適用すると、clientが送信済みと想定したpreeditをdeactivate(FocusOut)で再commitし、`FocusOut must not recommit already submitted preedit`でFAIL（Red）。最小修正後はClientUnfocusCommit有無両方で追加commitなし、session破棄/次入力再生成、空次語候補clear、通常reset/IME切替commit保持がPASS（Green）。これはengine呼出しのmock境界試験であり、Fcitx Instance/JNI実イベントはhost editorclear受入で別確認する。Linux addon全target build・failure ctest・Python30件成功。実core integration/Android plugin build/F52Signal再受入は後続結果を記録し、現時点では未実施。
