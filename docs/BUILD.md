@@ -44,7 +44,7 @@ clean な作業ツリーを渡します。毎回新しい場所へ clone し、�
 set -euo pipefail
 core_root=$(mktemp -d "${TMPDIR:-/tmp}/meltype-core.XXXXXXXX")
 git clone https://gitea.honya.dev/honya-dev-forks/meltype.git "$core_root/core"
-git -C "$core_root/core" checkout --detach 353995a43d9f43f78e13d8b9530d262d89962068
+git -C "$core_root/core" checkout --detach 444ce0d6532aa727987e6409b010e91a3889786e
 ```
 
 この調査環境では次のものを使いました。版は script が `--dotnet` / `--ndk-dir` の実物から確認します。

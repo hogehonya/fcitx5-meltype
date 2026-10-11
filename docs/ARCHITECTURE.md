@@ -207,3 +207,7 @@ pluginはGPL-3.0-or-laterとしてMeltype由来のCopyright 2026 Yukishiroと[NO
 ### Android画面・物理キーの直接英字接続（S-10）
 
 Linuxと同じState.directを使い、NativeAOT providerは固定87b1のまま変更しない。host TextKeyboardはMeltype時のみ専用キーを表示し、native statusでsubMode.labelがAなら復帰用Henkan、通常ならMuhenkanを送る。既存SymActionのVirtual入力を使用し、未消費文字はAndroid frontendのKeyEventからIME serviceがアプリへ確定する。GenKeyMappingは物理KEYCODE_MUHENKAN/HENKANにも同じsymを割り当てる。記号面ABCのlayout移動とLanguageKeyのIME切替は独立して維持する。
+
+## FocusOut境界（S-13）
+
+pinned Fcitx instanceのFocusOut ReservedFirstはClientUnfocusCommitなし時にclientPreeditをserver commitし、その後deactivateを呼ぶ。あり時はclientに任せる。addonは全FocusOutで内部sessionとpanelを破棄し、二重commitをしない。標準keyboardと同じ責任分担であり、通常reset/IME切替は既存commit経路を維持する。ABI/core/providerの変更は不要。

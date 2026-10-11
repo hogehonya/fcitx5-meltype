@@ -23,7 +23,7 @@ Meltypeの英日混在入力をFcitx5で使用し、Android端末でも入力・
 
 NativeAOT、arm64-v8a先行、Androidのin-process MozcはAgentによる実装判断として採用・検証した。ユーザーの初期要求そのものと混同しない。Gboard/ATOKの完全な複製、12キー/フリックの採用、他ABI対応、GitHub APK Release公開は確定要求に含めない。
 
-Android実装は実装ブランチを対象とし、既存main公開PR core #8 / plugin #11は未merge。2026-10-11のF-52E USB native受入は予測・通常変換・学習再読込・英字・かな英数切替が成功。次語統合版host62/plugin62/test63はF-52E次語・予測・切替・英字・reload・Enter native受入成功。normalはUSB切断で未実施、core CI17pending/plugin noCIのため統合保留。Pixel 7の今回版更新・予測受入は継続中。F-52E GUIは後続の明示送信許可により合成文で候補行・凡例非表示・1回目Enter確定/送信なし・2回目Enter改行をcurrent確認。private画面・会話は保存しない。CIや公開とは分けて[現状と検証](TESTING.md)に記録する。
+以下は2026-10-11の各試験時点の履歴です。当時Android実装は実装ブランチを対象とし、既存main公開PR core #8 / plugin #11は未mergeでした。2026-10-11のF-52E USB native受入は予測・通常変換・学習再読込・英字・かな英数切替が成功。次語統合版host62/plugin62/test63はF-52E次語・予測・切替・英字・reload・Enter native受入成功。normalはUSB切断で未実施、core CI17pending/plugin noCIのため統合保留。Pixel 7の今回版更新・予測受入は継続中。F-52E GUIは後続の明示送信許可により合成文で候補行・凡例非表示・1回目Enter確定/送信なし・2回目Enter改行をcurrent確認。private画面・会話は保存しない。最新のPixel 7受入・公開状況は[現状と検証](TESTING.md#2026-10-11-alpha1差し替え公開の確認範囲)を参照してください。CI修復と統合は[Issue #36](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/36)で追跡し、この履歴を現時点のCI成功の証拠とは扱いません。
 
 [要件と受入対応](SPECIFICATIONS.md) / [基本設計](ARCHITECTURE.md) / [文書一覧](README.md)
 
@@ -38,3 +38,7 @@ Android実装は実装ブランチを対象とし、既存main公開PR core #8 /
 ## Android英字モード反映（Issue #22）
 
 2026-10-10本会話でユーザーがLinux英字mode完成後「反映させて」とAndroidへの反映・実機更新を要求。Linux PR21の共有engineを取り込み、画面用のMeltype専用ABC/かな操作と物理無変換/変換mappingを接続する（画面操作はAgent採用案）。既存LanguageKey/数字記号面ABC layout切替は維持。公開試用版assetは変更せず、今回buildしたAPKをUSB指定端末へ更新して別に検証する。
+
+## 送信後のFocusOut（R-08、Issue #30）
+
+2026-10-11 ユーザー「それで試して実装してテストしよう」。F-52E Signal 8.30.3で未確定合成文をSpace変換後にアプリ送信すると同文が欄へ戻る。ATOK同手順は欄が空（root観測）。FocusOutの独自再commitを止める案を採用し、[Issue #30](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/30)で追跡する。通常reset・IME切替・明示確定を保持し、端末再受入で効果を確認する。
