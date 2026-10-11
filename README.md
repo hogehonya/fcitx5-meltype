@@ -14,7 +14,7 @@
 
 ## AndroidのビルドとAPK入手
 
-この`honya/android-plugin`ブランチにはAndroid実装を含みます。[ローカルAPK手順](android/README.md)・[ビルド入力](docs/BUILD.md)・[詳細実測](docs/TESTING.md)がこのブランチの正本です。以下のmain未反映という記述は既定ブランチの公開状態を示します。
+このAndroid実装ブランチにはAndroidコードを含みます。[ローカルAPK手順](android/README.md)・[ビルド入力](docs/BUILD.md)・[詳細実測](docs/TESTING.md)がこのブランチの正本です。以下のmain未反映という記述は既定ブランチの公開状態を示します。
 
 2026-10-10時点でAndroid arm64-v8aのhost・plugin・instrumentation APKをビルドし、moto g31（Android 12）、F-52E（Android 16）、Pixel 7（Android 17）へ導入しました。3端末とも日本語・英日混在入力、学習保存と別process再読込のinstrumentationが成功しています。GUI入力・候補確定はmoto g31のdarkとF-52Eのlightで確認済みです。Pixel 7のGUI確認は画面ロック解除待ちです。
 
@@ -25,6 +25,8 @@
 - [実機結果・SHA256・制限](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/docs/TESTING.md)。16KB page端末と他のJSON保存用途は実機未確認です。
 
 試用版の入手先・公開状態は[android-v0.1.0-alpha.1 のPre-releaseページ](https://github.com/hogehonya/fcitx5-meltype/releases/tag/android-v0.1.0-alpha.1)を参照してください。[導入・制限・対応ソースの案内](docs/ANDROID-TRIAL.md)に沿って、ライセンス付き導入ZIPのhost・pluginを組で導入します。stable版ではなくdebug署名です。上流Fcitx5 AndroidのRelease APKにこの統合が含まれるとは扱いません。元の検証済みAPKは作業ホストの `/home/honya/Downloads/Meltype-Android-20261010/` に保管しています。
+
+2026-10-11のFocusOut修正（[Issue #30](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/30) / [PR #31](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/31)）は製品source3134d2f、plugin68 APKを保存済み。F-52Eの同じ実JNI editorclear試験で旧plugin62は追加commitをFAIL再現、新plugin68はPASS。新Signal GUI・追加回帰・Pixelは未確認で、CI成功待ちのため未merge。成果物は作業ホスト `/home/honya/Downloads/Meltype-Android-Focusout-20261011/manifest.json`、検証の正本は[TESTING](docs/TESTING.md)。private会話/画像やユーザーデータ初期化を含みません。
 
 ## 設計・検証
 
