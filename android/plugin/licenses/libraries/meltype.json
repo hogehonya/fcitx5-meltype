@@ -1,0 +1,9 @@
+{
+  "uniqueId": "hogehonya/fcitx5-meltype",
+  "name": "Meltype Fcitx5 plugin",
+  "artifactVersion": "1.0.0-core",
+  "description": "Mixed Japanese and English input",
+  "website": "https://github.com/hogehonya/fcitx5-meltype",
+  "tag": "native",
+  "licenses": ["GPL-3.0-or-later"]
+}

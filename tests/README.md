@@ -5,7 +5,7 @@ fake の `dotnet` / NDK ツールと、NDK r28 の `llvm-readelf` で実際に�
 入力検証・ELF 検証・失敗時の後始末を確かめます。
 
 ```bash
-cd <repo>
+# リポジトリのrootで実行
 python3 -m unittest discover -s tests -t .
 ```
 
@@ -30,3 +30,5 @@ fake ツールは環境変数で挙動を切り替えます (`MELTYPE_TEST_DOTNE
 `ok` / `missing-export` / `versioned`)。実 build の代わりにこの切り替えで失敗経路を作ります。
 
 テスト用の fixture は [fixtures/README.md](fixtures/README.md) を参照してください。
+
+Native bridgeの実engine検証は[native/README.md](../native/README.md)を参照してください。host ctestは実Mozc変換・候補・寿命を検証します。

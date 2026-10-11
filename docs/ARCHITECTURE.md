@@ -4,9 +4,7 @@ Fcitx5の入力・候補UI、Meltypeの混在入力判定・ローマ字・学�
 
 ## 実装と公開の状態
 
-2026-10-10時点の実装根拠はplugin `14cbeaa`、host `a0cf7ed8`、core `87b1ae1` の各実装ブランチである。この設計文書のmain反映とAndroid実装のmain反映・公開は別工程であり、Android実装はまだmainへ統合されていない。以下は実装ブランチの動作を記述する。
-
-moto g31とF-52EでGUI入力の成功を確認した。PixelのGUI入力は未確認。2026-10-10 15:55 JST確認時点でcore head CI17件中Ubuntu push core1件は成功（15:55:14）、残16件はWaiting/Blocked・aggregate pending。Windows/macOSには適合runnerがなく、CI全体の成功は未確認。ビルド、instrumentation、GUI、CI、公開の合否を相互に代用しない。端末・試験別の証拠と未確認範囲は[TESTING](TESTING.md)に集約する。
+予測対応の実装根拠はplugin `64009ff`、製品host `047277e6`、core `353995a`。試験修正host `1e0295f9`は製品コードを変更していない。Android統合branchと既存main公開PR core #8 / plugin #11を区別し、main公開済みとは扱わない。今回版の端末・CI・公開状態は[TESTING](TESTING.md)を正本とする。
 
 ## ソース所属と3リポジトリの責務（S-01・S-08・S-09）
 
@@ -81,11 +79,11 @@ Meltype側の学習JSONと再読込を実装した。Mozc固有のlearn/save cal
 
 実装根拠: pluginの`addon/android_factory.cpp`・`native/mozc_bridge.cc`、coreの`src/Meltype.Mac.Native/Exports.cs`。これらのAndroidファイルは実装ブランチに存在し、文書mainだけでは参照できない場合がある。
 
-## 入力・変換・候補・確定（S-03・S-04）
+## 入力・変換・候補・確定（S-03・S-04・S-11・S-12）
 
 addonはFcitx keyをWindows VK・UTF-16文字・modifier bitへ変換する。最初の対応keyでInputContextごとのsessionを遅延作成し、coreへ渡す。未確定文字がないときだけ取得可能なsurrounding textをbefore/afterへ渡す。password/sensitive欄はcoreへ渡さず、通常の入力経路へ返す。
 
-coreのJSON結果から`commits`の削除と文字列確定、`view`のpreedit・hint・候補を反映する。候補リストは`converting=true`かつ候補が複数のときに表示し、候補indexをcoreへ戻す。JSONの`consumed`がtrueの場合だけkey eventを受理する。
+coreのJSON結果から`commits`の削除と文字列確定、`view`のpreedit・候補を反映する。hintはLinuxへだけ反映し、Androidは「Space 確定＋空白」等の操作説明auxUpを出さない。候補リストは`converting=true`かつ候補が複数のときに表示し、候補indexをcoreへ戻す。JSONの`consumed`がtrueの場合だけkey eventを受理する。
 
 ```mermaid
 %%{init: {"themeVariables": {"fontFamily": "IBM Plex Sans JP"}}}%%
@@ -98,7 +96,11 @@ sequenceDiagram
     U->>H: 英字入力 / Space
     H->>A: keyEvent・取得可能な周辺文字
     A->>C: meltype_handle_key
-    opt 日本語変換が必要
+    opt 日本語Auto編集中の予測
+        C->>B: 予測callback / StartPrediction
+        B-->>C: 最大20件の全文候補
+    end
+    opt Space等で日本語変換が必要
         C->>B: 文節・候補callback
         B-->>C: UTF-8変換結果
     end
@@ -114,22 +116,34 @@ sequenceDiagram
     A->>C: meltype_handle_key
     C-->>A: commit結果
     A->>H: commitString・preedit更新
+    opt 日本語Auto確定後の次語予測
+        C->>B: 空reading・確定context / StartPrediction
+        B-->>C: zero-query次語候補
+        C-->>A: 空preedit・候補view
+        A->>H: 次語候補表示
+    end
 ```
 
-候補tapが確定するか選択状態を更新するかはcoreの返すJSONに従う。図は代表操作の連携を示し、すべてのkeyを固定した状態遷移仕様に置き換えない。
+予測候補tapは全文を即確定する。通常Space変換の候補tapは文節選択を更新し、Enterで全文を確定する。図は代表操作の連携を示し、すべてのkeyを固定した状態遷移仕様に置き換えない。
 
 ```mermaid
 %%{init: {"themeVariables": {"fontFamily": "IBM Plex Sans JP"}}}%%
 stateDiagram-v2
     [*] --> NoSession
     NoSession --> Editing: 最初の対応keyでsession作成
-    Editing --> Editing: 文字入力・Backspace / preedit更新
+    Editing --> Editing: 文字入力・Backspace / preeditと予測更新
+    Editing --> NextWords: 予測tap / 全文確定・次語候補あり
     Editing --> Converting: Space等 / convertingなview
     Converting --> Converting: 候補移動・選択 / view更新
     Converting --> Editing: coreが編集viewを返す
     Editing --> Idle: commit / preeditなし
     Converting --> Idle: commit / preeditなし
     Idle --> Editing: 次の文字入力
+    Idle --> NextWords: 日本語確定・次語候補あり
+    NextWords --> NextWords: 候補tap / 追加確定・次語再予測
+    NextWords --> Editing: 新文字入力 / 古い次語を消去
+    NextWords --> Idle: Backspace・非文字key / 次語を消去
+    NextWords --> NoSession: context破棄
     Editing --> Idle: reset・deactivate / commit
     Converting --> Idle: reset・deactivate / commit
     Idle --> NoSession: context破棄
@@ -144,6 +158,8 @@ stateDiagram-v2
 ## ABIと安全境界（NF-01・NF-02）
 
 文字列はUTF-8 NUL終端。coreが返すJSONはadapterが`meltype_free`で解放する。callbackの文字列はC++側がmallocし、C#側がfreeする。変換失敗はNULL、候補は改行区切り、文節は`読み\t結果`の改行区切りで渡す。Linux helperのUS/RS protocolをAndroid callbackへそのまま流さない。
+
+任意export `meltype_set_prediction_callback`を最初のsession前に登録する。予測は既存変換callbackと分け、pure日本語Auto編集中の全文だけを対象にする。Androidの操作説明hint非表示はaddonのcompile-time境界で行い、core/providerや候補・キー・Linux表示を変更しない。入力途中の横候補とtap確定をPOBOX参考の範囲とし、確定後の次語予測もユーザー2026-10-11要求として実装する。callbackはreading/contextの2引数で、空readingでは直前最大20文字の日本語確定文脈を渡す。bridgeはReconstructHistoryとContext.preceding_text、zero_query_suggestion/mixed_conversionを空query時にのみ指定する。次語tapは追加文字列を確定し連続予測し、新打鍵・空Backspace・フォーカス変更で消去する。候補なしの文脈は非表示。部分候補を無効にし、prefix補完を同一読みの学習へ誤登録しない。F6/F7は予測を抑制し、F10の一回変換はpluginがcontext単位に追跡する。
 
 core exportは排他を提供しないため、呼出しはFcitx event threadで直列化する。callback・bridgeはsessionより長いprocess寿命を持つ。C++/managed例外は各ABI境界で失敗値へ変換し、hostへ漏らさない。addonは結果の削除範囲をすべて検証してからアプリの文字列を編集する。
 
@@ -187,3 +203,11 @@ pluginはGPL-3.0-or-laterとしてMeltype由来のCopyright 2026 Yukishiroと[NO
 ### Linux addonの直接英字状態
 
 `addon/engine.h`のInputContext property `State.direct` が直接英字モードを保持する。coreのNonConvert/Convert定数にはモード切替実装がないため、adapterでpending commit後に状態を変更し、直接モードの通常キーをcoreへ送らずアプリへ通す。core/session ABIやproviderを変更しない。InputMethodEngineV2のsubMode/labelで `A` と `あ` を表示する。既存reset/deactivateのcommit処理は維持しdirect状態は変更しない。
+
+### Android画面・物理キーの直接英字接続（S-10）
+
+Linuxと同じState.directを使い、NativeAOT providerは固定87b1のまま変更しない。host TextKeyboardはMeltype時のみ専用キーを表示し、native statusでsubMode.labelがAなら復帰用Henkan、通常ならMuhenkanを送る。既存SymActionのVirtual入力を使用し、未消費文字はAndroid frontendのKeyEventからIME serviceがアプリへ確定する。GenKeyMappingは物理KEYCODE_MUHENKAN/HENKANにも同じsymを割り当てる。記号面ABCのlayout移動とLanguageKeyのIME切替は独立して維持する。
+
+## FocusOut境界（S-13）
+
+pinned Fcitx instanceのFocusOut ReservedFirstはClientUnfocusCommitなし時にclientPreeditをserver commitし、その後deactivateを呼ぶ。あり時はclientに任せる。addonは全FocusOutで内部sessionとpanelを破棄し、二重commitをしない。標準keyboardと同じ責任分担であり、通常reset/IME切替は既存commit経路を維持する。ABI/core/providerの変更は不要。

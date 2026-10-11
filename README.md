@@ -18,10 +18,10 @@
 
 最新版は入力中・確定後の予測候補、画面の「あ/ア」「英数」変換、未確定時Enterの確定専用処理、focus-out時の文字再投入防止を含みます。候補行を残し、半透明のaux凡例は表示しません。機能追加段階のF-52E（Android16/arm64）検証に加え、plugin68では隔離editorclear試験と許諾済みGUI送信後の欄消去を確認しました。他のnative回帰項目はplugin68での再実行待ちです。Pixel7・moto g31の旧版での実績を最新版の確認とは扱いません。Pixel7（Android17）は無線許諾後にhost62/plugin68へ更新し、editorclear・Enter3件・次語の隔離試験が成功しました。GUIは画面ロック中で未確認、その他のnative回帰は未実行です。
 
-共通core `444ce0d` と未mergeのAndroid実装が対応ソースの対象です。必要なCIは未完のため実装PRはmerge保留です（[core PR10](https://gitea.honya.dev/honya-dev-forks/meltype/pulls/10)、[plugin PR29](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/29)、[focus-out PR31](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/31)、[host PR17](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/17)、[境界テストPR19](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/19)）。公開はCI完了を意味しません。
+共通core `444ce0d` とAndroid実装が対応ソースの対象です。この統合ブランチはAndroid addon・予測・F10・FocusOut修正を含みます。依存coreのCI修復と既定ブランチへの反映は[Issue #36](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/36)で追跡します。公開時点では必要なCIは未完でした（[core PR10](https://gitea.honya.dev/honya-dev-forks/meltype/pulls/10)、[plugin PR29](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/29)、[focus-out PR31](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/31)、[host PR17](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/17)、[境界テストPR19](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/19)）。公開はCI完了を意味しません。
 
 - 最新版のソース再現はRelease添付CorrespondingSourceの `SOURCE-README.md` と固定revision・ビルド入力を使います。GitHubの自動Source codeはAndroid実装を含みません。
-- 開発中の[Androidビルド手順](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/f5974122208e47a4c8f85b26f29acb200ba6aae5/android/README.md)と[検証記録](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/f5974122208e47a4c8f85b26f29acb200ba6aae5/docs/TESTING.md)は実装ブランチにあります。配布ファイルはmanifestの固定revisionを優先します。
+- [Androidビルド手順](android/README.md)と[検証記録](docs/TESTING.md)をこのリポジトリで管理します。配布ファイルはmanifestの固定revisionを優先します。
 - [初版と最新版の実測・制限](docs/TESTING.md)。API24下限、16KB page端末、他のJSON保存用途、全focus/password/回転等は未確認です。
 
 ## 設計・検証

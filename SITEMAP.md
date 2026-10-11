@@ -19,5 +19,10 @@
 - [LICENSE](LICENSE): GPL 原本
 - [NOTICE](NOTICE): 上流由来と別配布依存の帰属
 
+[In-process Mozc bridge・native buildと契約](native/README.md)（Issue #5）。APK/端末統合は別工程です。
+
+- [Core ABI header](native/include/meltype_native.h)
+- [Native include案内](native/include/README.md)
+
 - [要求定義](docs/REQUIREMENTS.md)
 - [要件定義](docs/SPECIFICATIONS.md)

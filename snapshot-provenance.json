@@ -1,0 +1,114 @@
+[
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/CMakeLists.txt",
+    "sha256": "21b7a17e74596fa73ba5de94b14566d4d4c359ba45909673480e86541e779c5a"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/native/README.md",
+    "sha256": "8ac1144e950e35acfbdb6aea58a5c0cb9879b23f4b91d1ae0b413651047238b8"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/native/bridge_test.cc",
+    "sha256": "872cf7c5d01cb85f9a2e25ce7116b27b124720b508c3f0c8a0699bd0d3649fd0"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/native/include/README.md",
+    "sha256": "53937865de158b0432fa5403b95b4acc1d5e724cc3715001b569b71c4b5b930a"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/native/include/meltype_native.h",
+    "sha256": "2941786953270c24736964f1b8b26ef70673283a54012cbdcdd0803aa4ce052f"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/native/meltype_mozc_bridge.h",
+    "sha256": "e94087de1d02f54049aa66336f3d994c55f9161b6df7da27447b5ac1400efbf2"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/native/mozc_bridge.cc",
+    "sha256": "c949f6b7db9662536ee1676f9a48ea8632129d816d4706d4c515855dfa673c9b"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/native/mozc_bridge.h",
+    "sha256": "417b04e8a1075ad3b174f5e3a3a2450b9e7cbc2c02a0c2d7c4e27fc56f564a2a"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/native/stage_mozc.py",
+    "sha256": "367157ff00a47c6b40e8856a3ba0690611a83fad551b97ab7f4f9063c3915327"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/NOTICE",
+    "sha256": "9d61c4c467a0b237f3a9fbc4d7966b1de77821ceaf907ab1b913e613c8e875c4"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/README.md",
+    "sha256": "b38ef4147b19441e86666143f35c15fef1af2846738e7b46947819f3ee63f5cd"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/SITEMAP.md",
+    "sha256": "7768ff0df6521cdef77c226bd9322c69cc28d74374a8c25214d1134d573ab89d"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/docs/ARCHITECTURE.md",
+    "sha256": "cd51e8ed76dcee84772a732f30e801514c809dc1f6941198e3f0144bc30ae492"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/docs/BUILD.md",
+    "sha256": "5ddcb106f419cafbefb31dd9749767016e324f82e052289a4ef50575ab80cd93"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/docs/README.md",
+    "sha256": "eefbafd0fba46f7557c8ef29e50f1aaa4d7e0a92d614af4b80755781ce6bb971"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/docs/TESTING.md",
+    "sha256": "52265e8f16b46b7bd06e5f810ead3d9bf25623e5cfd729e0b5025155b9f0d140"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-5-bridge/tests/README.md",
+    "sha256": "3357123276a51a762659947b53a451321f18dea3a60d5eb256e9d74a264404fe"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/THIRD-PARTY-NOTICES.md",
+    "sha256": "287a003b608afa48cca37667b6c04d3c23e3a280ccc521f0004aed05e7a213b4"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/addon/android_factory.cpp",
+    "sha256": "cb0254b4554a0fe39b28c856ce9d27fec0c4400c7b0216565450c973d98450af"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/android/plugin/build.gradle.kts",
+    "sha256": "9a92e0f381628ce113a5a59a202c0d1d3d2389ed5694341a569ddf27c1338568"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/android/plugin/licenses/libraries/meltype.json",
+    "sha256": "84c254bf7ad9e26167f42f2ec43eede232b5ab35e03b014bc3f5f746d4d7e47d"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/android/plugin/src/main/AndroidManifest.xml",
+    "sha256": "20ed3bc4938598d7a1873f3e4b0a8afc5a8597988b5c753691f70a0e2e8106dd"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/android/plugin/src/main/cpp/CMakeLists.txt",
+    "sha256": "56b863497b3cd0c20a964a7ae14e8d438ef5e003d18ce04b36c8ede433e6478c"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/android/plugin/src/main/res/values/strings.xml",
+    "sha256": "b798a09e76ed5efc14261a0450e21fc66a836243e232504dcbf1ce05c8868d70"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/android/plugin/src/main/res/xml/plugin.xml",
+    "sha256": "44b36c2e41d46448f91f359a5d303c1b98bfd1c264108fbcd236cc0e8f998e1c"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/android/plugin/src/main/res/xml/plugin_resources_keep.xml",
+    "sha256": "4fef1126f3416d73633ef2b92b9e1f16a1073a97c3c1e045b5bfb99af2b5be0d"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/scripts/check-plugin-apk.py",
+    "sha256": "72fb7f09c9de5685cf16fa7ba9e12ffdd351b9d2245ed444e12aa334ebbd32e9"
+  },
+  {
+    "source": "/home/honya/repos/worktrees/meltype-android-issue-8/NOTICE",
+    "sha256": "65a1c66587d3348b98f4d64e28e0c05c7e8274d20da535a739bf03b0d20be37c"
+  }
+]

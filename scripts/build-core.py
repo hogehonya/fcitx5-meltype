@@ -264,6 +264,15 @@ def check_invariant_globalization(staged_core: Path, lock: dict) -> str:
     return value
 
 
+def configure_android_soname(staged_core: Path, lock: dict) -> None:
+    """Give the staged provider the SONAME required by Bionic symbol version lookup."""
+    project = staged_core / str(lock["publish"]["project"])
+    tree = ElementTree.parse(project)
+    group = ElementTree.SubElement(tree.getroot(), "ItemGroup")
+    ElementTree.SubElement(group, "LinkerArg", {"Include": "-Wl,-soname," + str(lock["publish"]["installed_name"])})
+    tree.write(project, encoding="utf-8", xml_declaration=True)
+
+
 def extract_core(staged_core: Path, staging: Path, core_dir: Path, lock: dict, env: dict[str, str]) -> None:
     """固定 tree の追跡ファイルだけを staging へ取り出す (元 core へは何も書かない)。"""
     staging.mkdir(parents=True, exist_ok=True)
@@ -485,6 +494,8 @@ def verify_elf(library: Path, lock: dict, ndk: dict, env: dict[str, str]) -> dic
 
     check("elf_class", target["elf_class"], header.get("class"), header.get("class") == target["elf_class"])
     check("elf_machine", target["elf_machine"], header.get("machine"), header.get("machine") == target["elf_machine"])
+    soname = str(lock["publish"]["installed_name"])
+    check("elf_soname", soname, dynamic["soname"], dynamic["soname"] == soname)
     actual_type = (header.get("type") or "").split()[0] if header.get("type") else ""
     check("elf_type", target["elf_type"], header.get("type"), actual_type == target["elf_type"])
     check(
@@ -638,6 +649,7 @@ def build(args: argparse.Namespace) -> None:
         extract_core(staged_core, staging, core_dir, lock, env)
         log(f"  {staged_core} へ追跡ファイルだけを展開 (元 core へは書かない)")
         invariant = check_invariant_globalization(staged_core, lock)
+        configure_android_soname(staged_core, lock)
         log(f"  InvariantGlobalization={invariant} を確認")
 
         log("== 3/5 NativeAOT publish")
@@ -697,6 +709,7 @@ def build(args: argparse.Namespace) -> None:
                 "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
                 "PATH_prepended": str(ndk["llvm_bin"]),
                 "InvariantGlobalization": "false",
+                "SONAME": str(lock["publish"]["installed_name"]),
                 "nuget_sources": sources,
                 "nuget_packages": env.get("NUGET_PACKAGES", str(Path.home() / ".nuget" / "packages")),
             },

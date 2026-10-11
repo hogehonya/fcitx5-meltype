@@ -20,6 +20,7 @@ import sys
 import tempfile
 import textwrap
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -539,6 +540,18 @@ class FailureArtifactsTest(BuildCoreTestCase):
 
 class ElfParsingTest(unittest.TestCase):
     """NDK r28 の llvm-readelf 出力 (tests/fixtures) を読めること。"""
+
+    def test_provider_without_soname_is_rejected_for_bionic(self) -> None:
+        sections = {
+            "header": read_fixture("readelf-ok-header.txt"),
+            "dyn_symbols": read_fixture("readelf-ok-dyn-syms.txt"),
+            "dynamic": "\n".join(line for line in read_fixture("readelf-ok-dynamic.txt").splitlines() if "SONAME" not in line),
+            "program_headers": read_fixture("readelf-ok-program-headers.txt"),
+        }
+        lock = json.loads((REPOSITORY_ROOT / "scripts/deps.lock.json").read_text())
+        with patch.object(BUILD_CORE, "readelf_sections", return_value=sections):
+            with self.assertRaisesRegex(BUILD_CORE.BuildError, "elf_soname"):
+                BUILD_CORE.verify_elf(Path("libMeltypeNative.so"), lock, {"llvm_readelf": Path("readelf")}, {})
 
     def test_parse_elf_header(self) -> None:
         header = BUILD_CORE.parse_elf_header(read_fixture("readelf-ok-header.txt"))

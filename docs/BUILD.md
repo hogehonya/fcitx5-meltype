@@ -1,10 +1,8 @@
 # ビルド準備と工程
 
-このmainの手順はLinux addon・NativeAOT単体生成を対象にします。Android完成ブランチの再現には[plugin14cbeaaのAPK手順](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/android/README.md)と[固定依存](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/docs/BUILD.md)を使います。core87b1→plugin14cbeaa→hosta0cfは実機検証済みですがCI待ちで未mergeです。[実測](TESTING.md#2026-10-10のandroid受入結果) / [要件](SPECIFICATIONS.md)を参照してください。
-
 このrepoのビルド入口は `scripts/build-core.py` です。固定coreから `arm64-v8a` の NativeAOT 共有
 ライブラリを作り、`manifest.json` と検証結果を残します。Linux Fcitx5 addon は [addon/README.md](../addon/README.md) の独立 CMake 入口で build できます。
-このmainにはAndroid Gradle task、factory/bridge 統合、APKがまだ含まれません。完成ブランチの手順は冒頭リンクを参照します。Android addon/APK の工程は後半に書きます。
+Android factory/bridge と Gradle module は実装済みです。[Android APK手順](../android/README.md)でhost forkへ登録してビルドします。
 
 controller環境で共有ライブラリの生成、必須export、16KB LOAD alignmentを検証しています。
 worker sandboxのAF_UNIX制限による失敗は[実行記録](#実行記録)で分離しています。
@@ -16,7 +14,7 @@ core/toolchain/ABI固定値の正本は [`scripts/deps.lock.json`](../scripts/de
 
 |依存|固定revision|用途|
 |---|---|---|
-|[Meltype fork](https://gitea.honya.dev/honya-dev-forks/meltype/src/commit/9c84625e894f50f06cafba1c6aada5eaa65208f4)|`9c84625e894f50f06cafba1c6aada5eaa65208f4`|net10.0 core、C ABI。NativeAOT build の入力|
+|[Meltype fork](https://gitea.honya.dev/honya-dev-forks/meltype/src/commit/353995a43d9f43f78e13d8b9530d262d89962068)|`353995a43d9f43f78e13d8b9530d262d89962068`|net10.0 core、C ABI。NativeAOT build の入力|
 |.NET SDK|`10.0.100`|NativeAOT の publish|
 |Android NDK|`28.0.13004108`|Bionic arm64 のリンクと `llvm-readelf` による検証|
 |RID / ABI|`linux-bionic-arm64` / `arm64-v8a`|build と成果物の対象|
@@ -46,7 +44,7 @@ clean な作業ツリーを渡します。毎回新しい場所へ clone し、�
 set -euo pipefail
 core_root=$(mktemp -d "${TMPDIR:-/tmp}/meltype-core.XXXXXXXX")
 git clone https://gitea.honya.dev/honya-dev-forks/meltype.git "$core_root/core"
-git -C "$core_root/core" checkout --detach 9c84625e894f50f06cafba1c6aada5eaa65208f4
+git -C "$core_root/core" checkout --detach 444ce0d6532aa727987e6409b010e91a3889786e
 ```
 
 この調査環境では次のものを使いました。版は script が `--dotnet` / `--ndk-dir` の実物から確認します。
@@ -71,7 +69,7 @@ script の手順は次のとおりです。引数の一覧は [scripts/README.md
 1. `--output-dir` が存在しないこと、core の SHA が lock と一致し作業ツリーが clean であること、
    `dotnet --version` と NDK の `Pkg.Revision` が lock と一致すること、core の
    `InvariantGlobalization=false` が維持されていることを確認する。output-dir は core の中に置かない。
-2. `--output-dir/staging` へ core の追跡ファイルだけを `git archive` で取り出す (元 core へは書かない)。
+2. `--output-dir/staging` へ core の追跡ファイルだけを `git archive` で取り出す (元 core へは書かない)。隔離csprojへ `LinkerArg=-Wl,-soname,libMeltypeNative.so` を加え、Bionicのversioned symbol lookupで必要なSONAMEを付ける。
 3. NDK の LLVM bin を `PATH` の先頭に置き、`DOTNET_CLI_TELEMETRY_OPTOUT=1` で publish する。
 
 ```bash
@@ -87,14 +85,14 @@ restore するには取得先が必要です。既存`linux/build.sh`と同様�
 
 4. `llvm-readelf` で `ELF64` / `AArch64` / `DYN` と little endian、必須 export 9 個
    (`meltype_init` / `meltype_create` / `meltype_destroy` / `meltype_handle_key` / `meltype_commit` /
-   `meltype_select_candidate` / `meltype_set_direct` / `meltype_free` / `meltype_set_data_directory`)、
-   全 `LOAD` の `p_align >= 16384` を検証する。`SONAME` と `NEEDED` は記録する。
+   `meltype_select_candidate` / `meltype_set_direct` / `meltype_free` / `meltype_set_data_directory` / `meltype_set_prediction_callback`)、
+   全 `LOAD` の `p_align >= 16384`、`SONAME=libMeltypeNative.so` を検証する。`SONAME` と `NEEDED` は記録する。
 5. `lib/arm64-v8a/libMeltypeNative.so`、`manifest.json`、`LICENSE` と `THIRD-PARTY-NOTICES.md` の原本、
    `logs/publish.log` (IL2026/IL3050 の JSON AOT 警告を含む)、`README.md` を残す。
 
 `manifest.json` は最後に書きます。途中で失敗したら `--output-dir` ごと削除し、非 0 で終わります
 (成功 manifest を残さない)。終了コードは 0=成功、1=失敗、2=引数の誤りです。この成果物は APK では
-なく、addon への収録と端末検証は[今後追加するAPK工程](#android統合工程mainには未反映)です。
+なく、addon への収録と端末検証は[Android APK工程](#android-apk工程)です。
 
 ## 実行記録
 
@@ -124,7 +122,7 @@ IL2026/IL3050警告は保存されており、端末実行・JSON保存の成功
 
 ## ICU/globalization と page size
 
-旧mainのNativeAOT単体生成時点では ICU/globalization、libssl の必要性、minimum API は実機未確認でした。Android完成ブランチでICU初期化を確認済みですが、API24下限の実機検証は未実施です。core は
+NativeAOT 側の ICU/globalization、libssl の必要性、minimum API は実機で未確認です。core は
 `InvariantGlobalization=false` なので Android で ICU が解決できるかを実機で検証します。無条件に
 invariant へ切り替えたり、OpenSSL を不要と決めたりしません。v10 資料は minimum API 21 と記載して
 いますが、採用 runtime pack の実値と host minSDK 23 の両方を確認します。16KB page は ILCompiler が
@@ -145,17 +143,9 @@ APK packaging 側の alignment は別途確認します。[16KB公式手順](htt
 再現可能なbuild定義へ取り込みます。現時点のcloneコマンドだけでMozc buildが成功するという保証は
 ありません。
 
-## Android統合工程（mainには未反映）
+## Android APK工程
 
-1. 既存共通adapterへAndroid factory・bridgeを接続し、既存保存先APIをhostから呼ぶ。callback header・exportを照合する。coreへの保存先API再追加は不要。
-2. host forkへ固定revision参照の`plugin/meltype`を登録する。既存Mozc pluginのPrefab依存・
-   addon/assets収録方法を参考にする。
-3. CMake imported shared targetでNativeAOTライブラリへリンクし、Mozc静的engine・辞書生成を
-   組み込む。hostと一致するSTLを使用し、Fcitx/libc++を重複収録しない。
-4. arm64を初期MVPとする提案を採用する場合、hostの`buildABI`をarm64-v8aへ制限する。module追加後に
-   `tasks`で実在taskを確認してからAPKコマンドを文書へ追加する。このmainには`plugin:meltype`taskがない。検証済みAndroidブランチには実装済み。
-5. APK内にaddon、NativeAOT `.so`、inputmethod/addon設定、辞書、必要な依存とライセンスを収録し、
-   [TESTING](TESTING.md)で端末検証する。
+現在のビルド入口、必要な固定入力、host登録、SDK/ABI、成果物検査は[Android手順](../android/README.md)を正本とします。root CMake は in-process Mozc bridge、`android/plugin` は Android addon/APK、`addon/CMakeLists.txt` は Linux addonです。
 
 [構成](ARCHITECTURE.md) / [検証](TESTING.md) / [文書一覧](README.md)
 
@@ -164,3 +154,5 @@ APK packaging 側の alignment は別途確認します。[16KB公式手順](htt
 core更新はMeltype forkで上流差分と必要変更を検証しlockを検証済みrevisionへ更新します。ABIシグネチャ・実export・JSON schema・所有権の互換性とライセンスを照合し回帰試験と実buildを行います。host更新は本書のSHAとsubmodule/build条件・キーボード基準を再確認します。統合後は端末回帰試験も行い未実施はIssueへ記録します。Linux provider版は[addon](../addon/README.md)で別管理します。
 
 Gitea `origin/main`を正本とし、PR・検証・マージ後の同じrevisionを公開GitHub `hogehonya/fcitx5-meltype` の `main`へfast-forwardのみで反映し、公開先の履歴を保持します。現在このrepoにCIは設定されていないため、該当する既存テスト・リンク・diff検査を実行します。今後CIを設定した場合は成功を必須とします。releaseは両main一致確認後に作成しcore/hostと検証範囲を記録します。現在、自動mirrorは設定されていません。
+
+予測対応coreはIssue #27の次語要求により444ce0dへ更新。従来の設定・学習JSON形式を維持し、任意予測callback exportを追加する。次語対応でcallback引数はreading/contextの2個になったため、旧353995aのartifactと混用しない。古いcore providerではAndroid factoryの追加symbolを解決できないため、lock指定coreからartifactを再生成する。

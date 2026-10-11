@@ -1,7 +1,7 @@
 # Meltype Fcitx5 addon
 
 [Issue #6](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/6) の Linux 最小プラグインです。`engine.cpp`、`session.h`、`meltype_abi.h` は Android でも共有する入力・ABI 部分、`factory.cpp` は Linux の Mozc helper 初期化です。
-Android の in-process Mozc bridge、factory、host登録、APKは[検証済み未mergeブランチ](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/src/commit/14cbeaa/android/README.md)に実装済みです。このmainにはまだ含まれません。この CMake 入口は Android を受け付けず、未完成の APK 成功を装いません。
+Android の in-process Mozc bridge、factory、host登録、APKのビルド手順は[Android手順](../android/README.md)を参照してください。この CMake 入口はLinux addon用です。
 
 ## Linux build
 
@@ -59,6 +59,6 @@ Linux では上流 `meltype_init_mozc` と既存 helper が変換・Mozc 学習�
 
 ## 実行結果
 
-2026-10-10 に上記 Linux build、実 core integration test と異常回復 test (2/2) が成功しました。別 D-Bus / Xvfb の GTK 入力欄で addon をロードし、`kyouhagithubnipushshita` + Enter が `今日はgithubにpushした` になる実 GUI 確認も成功しました。通常デスクトップの入力設定はその検証では変更していません。Androidクロスbuild・APK・端末試験は別ブランチで実施済みです。[実測](../docs/TESTING.md#2026-10-10のandroid受入結果)を参照してください。
+2026-10-10 に上記 Linux build、実 core integration test と異常回復 test (2/2) が成功しました。別 D-Bus / Xvfb の GTK 入力欄で addon をロードし、`kyouhagithubnipushshita` + Enter が `今日はgithubにpushした` になる実 GUI 確認も成功しました。通常デスクトップの入力設定はその検証では変更していません。Androidクロスbuild・APK・端末試験は別ブランチで実施済みです。[実測](../docs/TESTING.md)を参照してください。
 
 キー変換と JSON 表示契約は GPL-3.0-or-later の上流 Meltype `linux/ibus-engine-meltype` (Copyright 2026 Yukishiro) と core ABI に基づきます。NativeAOT / Mozc / Fcitx の既存ライセンスと NOTICE は配布元のものを保持してください。

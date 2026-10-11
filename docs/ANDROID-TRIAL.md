@@ -32,7 +32,7 @@ stable版ではありません。両APKは同じdebug署名で、正式版と署
 - moto g31 Android12、F-52E Android16、Pixel7 Android17で日本語・英日混在入力、学習保存と別process再読込のinstrumentationが成功。
 - GUIキー入力・Space候補・選択/Enter確定はmoto g31 darkとF-52E lightで確認。Pixel7 GUI、API24下限端末、16KB page端末は未確認。
 - 変換履歴以外のNativeAOT JSON保存、全focus/password/回転等の網羅試験は未完。Mozc固有学習callbackは未対応です。
-- 2026-10-11時点でも必要なCIは未完、Android実装は既定mainへ未merge。[core PR8](https://gitea.honya.dev/honya-dev-forks/meltype/pulls/8) / [plugin PR11](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/11) / [host PR11](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/11)。試用版公開はCI完了・stable化を意味しません。
+- 2026-10-11の公開時点では必要なCIは未完、Android実装は既定mainへ未mergeでした。後続の統合と依存CI修復は[Issue #36](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/issues/36)で追跡します。[core PR8](https://gitea.honya.dev/honya-dev-forks/meltype/pulls/8) / [plugin PR11](https://gitea.honya.dev/honya-dev-forks/fcitx5-meltype/pulls/11) / [host PR11](https://gitea.honya.dev/honya-dev-forks/fcitx5-android/pulls/11)。試用版公開はCI完了・stable化を意味しません。
 
 確認範囲と過去の実測は[TESTING](TESTING.md)、要求・要件・設計は[文書一覧](README.md)を参照してください。問題は端末/Android版・操作・期待結果を添えて[Issue](https://github.com/hogehonya/fcitx5-meltype/issues)へ報告できます。個人の入力文や学習ファイルを公開する必要はありません。
 
